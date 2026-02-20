@@ -1,25 +1,26 @@
-import { useForm } from "react-hook-form";
-import "../App.css"
+import "../styling/AdminLoginStyles.css"
 
 
 export default function AdminLoginForm() {
-    const { formState: { errors } } = useForm();
     return (
-        <>
-            <h2>Login as Admin</h2>
+        <div className="container">
+            <div className="form-wrapper">
+                <h2>Login as Admin</h2>
 
-            <form className="App">
-                <input type="email"
-                    placeholder="Enter your email"
-                />
-                {errors.email && <span style={{ color: "red" }}>*Email* is mandatory</span>}
+                <form>
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email" />
+                    </div>
 
-                <input type="password" placeholder="Enter your password"
-                />
-                {errors.password && <span style={{ color: "red" }}>*Password* is mandatory</span>}
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password" />
+                    </div>
 
-                <input type="submit" style={{ backgroundColor: "#a1eafb"}}/>
-            </form>
-        </>
+                    <input type="submit" value="Submit" />
+                </form>
+            </div>
+        </div>
     );
 };
