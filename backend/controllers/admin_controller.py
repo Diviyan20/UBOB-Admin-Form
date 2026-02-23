@@ -1,6 +1,6 @@
 import logging
 import os
-import requests
+import xmlrpc.client
 from dotenv import load_dotenv
 
 
@@ -9,6 +9,7 @@ load_dotenv()
 # ENVIRONMENT VARIABLE CONFIGURATION
 ODOO_DATABASE_URL = os.getenv("ODOO_DATABASE_URL")
 ODOO_API_TOKEN = os.getenv("ODOO_API_TOKEN")
+ODOO_DATABASE_NAME = os.getenv("ODOO_DATABASE_NAME")
 
 # LOGGING
 logging.basicConfig(
@@ -26,86 +27,61 @@ def odoo_headers():
         "Content-Type": "application/json"
     }
 
-def fetch_all_users():
+def validate_admin_login(email:str, password: str)-> dict:
     """
-    Fetch all users from the Odoo res.users model
-    
-    Returns:
-        list: List of user dictionaries with id, name, login, password fields 
-    """
-    try:
-        log.info("Fetching all users from Odoo res.users...")
-        
-        response = requests.post(
-            f"{ODOO_DATABASE_URL}/api/users",
-            json={},
-            headers=odoo_headers(),
-            timeout=15
-        )
-        
-        response.raise_for_status()
-        
-        data = response.json()
-        users = data.get("data",[])
-        
-        log.info(f"Fetched {len(users)} users from Odoo.")
-        return users
-
-    except Exception as e:
-        log.error(f"Error fetching data: {e}")
-        return []
-
-def validate_admin_login(email:str, passwrod: str)-> dict:
-    """
-    Validate admin credentials against Odoo res.users (brute force method).
+    Validate admin credentials using Odoo XML-RPC.
     
     This fetches all users and checks if email and password match.
     Note: This is temporary until a secure authentication endpoint is available.
-    
-    Args:
-        email: Admin email/login
-        password: Admin password
-    
-    Returns:
-        dict: {"is_valid": bool, "user_id": int, "name": str} or {"is_valid": False, "error": str}
     """
     try:
         log.info(f"Validating email for {email}")
         
-        users = fetch_all_users()
+        # Connect to Odoo XML-RPC client endpoint
+        common = common = xmlrpc.client.ServerProxy(f"{ODOO_DATABASE_URL}/xmlrpc/2/common")
+        common.version()
         
-        if not users:
+        # Try to authenticate
+        uid = common.authenticate(ODOO_DATABASE_NAME, email, password,{})
+        
+        if uid:
+            # Authentication successful, get user details
+            models = xmlrpc.client.ServerProxy(f"{ODOO_DATABASE_URL}/xmlrpc/2/object")
+            
+            # Read user data
+            user_data = models.execute_kw(
+                ODOO_DATABASE_NAME, uid, password,
+                'res.users', 'read',
+                [uid],
+                {'fields':['name', 'login', 'email']}
+            )
+            
+            if user_data:
+                user = user_data[0]
+                log.info(f"Login successful for {email}")
+                return{
+                    "is_valid": True,
+                    "user_id": uid,
+                    "name": user.get("name", "Admin"),
+                    "email": user.get("login", email)
+                }
+        else:
+            log.error(f"Invalid credentials for {email}")
             return{
                 "is_valid": False,
-                "error": "Could not fetch users from Odoo."
+                "error": "Invalid email or password."
             }
-        
-        # Searching for matching user
-        for user in users:
-            user_login = user.get("login", "")
-            user_password = user.get("password", "")
-            
-            # Check if login matches
-            if user_login.lower() == email.lower():
-                # Check for password
-                if user_password == passwrod:
-                    log.info(f"Login successful for {email}")
-                    return {
-                        "is_valid": True,
-                        "user_id": user.get("id"),
-                        "name": user.get("name", "Admin"),
-                        "email": user_login
-                    }
-                
-        log.warning(f"❌ Invalid credentials for {email}")
-        return {
+    
+    except xmlrpc.client.Fault as e:
+        log.error(f"XML-RPC Fault: {e}")
+        return{
             "is_valid": False,
-            "error": "Invalid email or password"
+            "error": "Invalid credentials"
         }
     
     except Exception as e:
-        log.error(f"Error validating email: {e}")
+        log.error(f"Error: {e}")
         return{
             "is_valid": False,
-            "error":"Authentication Failed"
+            "error": "Authentication Failed."
         }

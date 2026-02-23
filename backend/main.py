@@ -10,6 +10,8 @@ from controllers.admin_controller import validate_admin_login
 # BACKGROUND JOBS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+
+# Flask Setup
 app = Flask(__name__, static_folder="static")
 
 CORS(
@@ -22,7 +24,6 @@ CORS(
         }
     },
 )
-
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
 
@@ -42,17 +43,7 @@ log = logging.getLogger(__name__)
 @app.route("/admin/login", methods=["POST"])
 def admin_login():
     """
-    Validate admin credentials
-    
-    Request body:
-    {
-        "email": "admin@example.com",
-        "password": "password123"
-    }
-    
-    Response:
-        Success (200): {"is_valid": true, "user_id": 1, "name": "Admin Name"}
-        Failure (401): {"is_valid": false, "error": "Invalid credentials"}
+    Validate admin credentials via XML-RPC (Temporary)
     """
     data = request.get_json(force=True)
     email = data.get("email")
