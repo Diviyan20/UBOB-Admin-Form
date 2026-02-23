@@ -1,6 +1,5 @@
 import "../styling/ConfigurationStyles.css"
 
-
 export default function ConfigurationForm(){
     return(
         <div className="container">
@@ -28,5 +27,5 @@ export default function ConfigurationForm(){
             </div>
 
         </div>
-    )
-}
+    );
+};

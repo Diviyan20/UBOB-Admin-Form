@@ -1,12 +1,10 @@
 import './App.css'
-import ConfigurationForm from './views/ConfigurationForm'
+import AdminLoginForm from './views/AdminLoginForm'
 
 function App() {
   return (
     <>
-      <div>
-        <ConfigurationForm/>
-      </div>
+        <AdminLoginForm/>
     </>
   )
 }
