@@ -10,7 +10,7 @@ export default function AdminLoginForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const handleSubmit = async (e: React.FormEvent) =>{
+    const handleSubmit = async (e: React.ChangeEvent) =>{
         e.preventDefault();
         setError("");
 
@@ -25,7 +25,7 @@ export default function AdminLoginForm() {
 
             const response = await fetch(`${SERVER_URL}/admin/login`, {
                 method: "POST",
-                headers: {"Content-Type": "applicatiom/json"},
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({email, password})
             });
 
