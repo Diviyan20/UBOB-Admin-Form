@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styling/AdminLoginStyles.css"
 
 
@@ -9,6 +10,7 @@ export default function AdminLoginForm() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.ChangeEvent) =>{
         e.preventDefault();
@@ -32,10 +34,11 @@ export default function AdminLoginForm() {
             const data = await response.json();
 
             if (response.ok && data.is_valid){
-                // Login Successfule
+                // Login Successful
                 console.log(`Login Successful: ${data}`);
-                alert(`Welcome ${data.name}!`);
-                // TODO: Redirect to admin dashboard
+                // alert(`Welcome ${data.name}!`);
+                navigate("/configuration");
+                
             }
             else{
                 setError(data.error || "Login Failed");
