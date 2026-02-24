@@ -1,10 +1,9 @@
-import datetime
 import logging
-from time import timezone
 import psycopg2
 import os
-
+from datetime import datetime, timezone
 from dotenv import load_dotenv
+from contextlib import contextmanager
 
 load_dotenv()
 
@@ -25,8 +24,11 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
+@contextmanager
 def get_db_connection():
-    # Connect to the database with Environment Variables using psycopg2
+    """Connect to the database with Environment Variables using psycopg2"""
+    conn = None
+    cur = None
     try:
         conn = psycopg2.connect(
             database = OUTLET_DATABASE,
@@ -48,8 +50,9 @@ def get_db_connection():
         raise
 
     finally:
-        if cur and conn:
+        if cur:
             cur.close()
+        if conn:
             conn.close()
 
 def get_outlet_info(outlet_id: str) -> dict:
@@ -58,7 +61,7 @@ def get_outlet_info(outlet_id: str) -> dict:
     Returns None if no ID is found.
     """
     try:
-        with get_db_connection as (conn, cur):
+        with get_db_connection() as (conn, cur):
             query = "SELECT * FROM active_outlets WHERE outlet_id = %s"     # Query to select all fields based on outlet_id
             
             cur.execute(query, [outlet_id])     # Executes query with outlet_id as the parameter
@@ -91,13 +94,19 @@ def register_outlet(outlet_id:str, outlet_name:str, region_name:str,
     Utilizes the 'get_db_connection' function to connect to the database.
     """
     try:
-        with get_db_connection as (conn, cur):
+        with get_db_connection() as (conn, cur):
             now = datetime.now(timezone.utc)
             
             # Check if outlet exists
             existing = get_outlet_info(outlet_id)
             
-            if not existing:
+            if existing:
+                return{
+                    "success": False,
+                    "error": "Outlet already exists"
+                }
+            
+            else:
                 # Register the outlet if it does not exist
                 query = """
                     INSERT INTO active_outlets 
