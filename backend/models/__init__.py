@@ -1,1 +1,0 @@
-from active_outlets_db import get_db_connection, get_outlet_info, register_outlet

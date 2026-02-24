@@ -6,6 +6,7 @@ from flask_cors import CORS
 
 # CONTROLLERS
 from controllers.admin_controller import validate_admin_login
+from controllers.outlet_controller import fetch_all_outlets_from_odoo
 
 # BACKGROUND JOBS
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -60,6 +61,23 @@ def admin_login():
         return jsonify(result), 200
     else:
         return jsonify(result), 401
+
+
+# ==================
+# OUTLET ENDPOINTS
+# ==================
+@app.route("/api/outlets", methods=["GET"])
+def get_all_outlets():
+    """Get all the outlets from Odoo for the Dropdown Component"""
+    outlets = fetch_all_outlets_from_odoo()
+    if outlets:
+        
+        return jsonify({"outlets": outlets}), 200
+    else:
+        return jsonify({
+            "success": False,
+            "error": "API did not call successfully"
+        }), 405
 
 
 if __name__ == "__main__":
