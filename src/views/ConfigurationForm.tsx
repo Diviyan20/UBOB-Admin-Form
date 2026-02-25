@@ -10,6 +10,9 @@ export default function ConfigurationForm() {
         console.log("Selected:", outletId, outletName);
     };
 
+    // Load the order tracking url
+    const fullUrl = import.meta.env.VITE_ORDER_TRACKING_URL
+
     return (
         <div className="container">
             <div className="form-wrapper">
@@ -17,7 +20,6 @@ export default function ConfigurationForm() {
 
                 <form>
                     <div className="form-group">
-                        <label htmlFor="outlet_id" id="outlet_id">Outlet ID</label>
                         <DropdownComponent onSelect={handleOutletSelect}/>
 
                         {selectedOutlet && (
@@ -27,7 +29,7 @@ export default function ConfigurationForm() {
 
                     <div className="form-group">
                         <label htmlFor="order_url">Preparation Screen URL</label>
-                        <input id="outlet_id" placeholder="Preparation Screen URL" readOnly={true} />
+                        <input id="order_url" value={fullUrl} readOnly={true} />
                     </div>
 
                     <div className="form-group">

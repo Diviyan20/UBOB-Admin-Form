@@ -38,6 +38,7 @@ def fetch_all_outlets_from_odoo() -> list:
     """
     Fetch all outlets from Odoo using the API Endpoint.
     Returns list of outlets with id, name, and region
+    Appends the fetched data into a list
     """
     try:
         log.info("Fetching all outlets from Odoo...")
@@ -52,12 +53,14 @@ def fetch_all_outlets_from_odoo() -> list:
         response.raise_for_status()
         data = response.json()
         
-        # Extract outlets from all regions
-        outlets = []
+        outlets = []    # Create a list to store the data
+        
+        # Extract the data from the endpoint
         for region in data.get("data", []):
             region_name = region.get("outlet_region_name")
             
             for outlet in region.get("pos_shops", []):
+                # Ensure the parameters are the same as the JSON response from the endpoint
                 outlets.append({
                     "outlet_id": str(outlet.get("id")),
                     "outlet_name": outlet.get("name"),
