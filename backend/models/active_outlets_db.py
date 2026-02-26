@@ -97,7 +97,7 @@ def register_outlet(outlet_id:str, outlet_name:str, region_name:str,
         with get_db_connection() as (conn, cur):
             now = datetime.now(timezone.utc)
             
-            # Check if outlet exists
+            # Check if outlet exists (use the 'get_outlet_info()' function)
             existing = get_outlet_info(outlet_id)
             
             if existing:
@@ -106,19 +106,18 @@ def register_outlet(outlet_id:str, outlet_name:str, region_name:str,
                     "error": "Outlet already exists"
                 }
             
-            else:
-                # Register the outlet if it does not exist
-                query = """
+            # Register the outlet if it does not exist
+            query = """
                     INSERT INTO active_outlets 
                     (outlet_id, outlet_name, outlet_status, outlet_location, 
                      active, last_seen, order_api_url, order_api_key)
-                    VALUES (%s, %s, 'online', %s, %s, %s, %s, %s)
+                    VALUES (%s, %s, 'offline', %s, %s, %s, %s, %s)
                     RETURNING *
                 """
-                cur.execute(query, [outlet_id, outlet_name, region_name, now, now, order_api_url, order_api_key])
+            cur.execute(query, (outlet_id, outlet_name, region_name, now, now, order_api_url, order_api_key))
                 
-                outlet = cur.fetchone()
-                conn.commit()
+            outlet = cur.fetchone()
+            conn.commit()
                 
             return{
                 "success": True,

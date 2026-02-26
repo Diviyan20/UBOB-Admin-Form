@@ -2,10 +2,7 @@ import os
 import logging
 import requests
 from dotenv import load_dotenv
-from models.active_outlets_db import (
-    get_db_connection,
-    register_outlet
-)
+from models.active_outlets_db import register_outlet
 
 load_dotenv()
 
@@ -73,3 +70,23 @@ def fetch_all_outlets_from_odoo() -> list:
     except Exception as e:
         log.error(f"Error fetching outlets from Odoo: {e}")
         return []
+
+
+def add_outlet(outlet_id:str, outlet_name:str, region_name:str, 
+                    order_api_url:str, order_api_key:str) -> dict:
+    log.info(f"Registering outlet {outlet_id}({outlet_name}) into Database")
+    
+    try:
+        register_outlet(
+            outlet_id= outlet_id,
+            outlet_name= outlet_name,
+            region_name= region_name,
+            order_api_url= order_api_url,
+            order_api_key=order_api_key
+        )
+        
+        log.info(f"Successfully registered outlet {outlet_id}({outlet_name}) into the Database.")
+        return outlet_id
+    
+    except Exception as e:
+        log.error(f"Error writing into Database: {e}")
