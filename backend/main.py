@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 # CONTROLLERS
 from controllers.admin_controller import validate_admin_login
-from controllers.outlet_controller import fetch_all_outlets_from_odoo
+from controllers.outlet_controller import (fetch_all_outlets_from_odoo, add_outlet)
 
 # BACKGROUND JOBS
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -78,6 +78,54 @@ def get_all_outlets():
             "success": False,
             "error": "API did not call successfully"
         }), 405
+
+@app.route("/api/register_outlet", methods=["POST"])
+def register_outlet():
+    """ Register a new outlet into the database """
+    data = request.get_json(force=True)
+    
+    outlet_id = data.get("outlet_id")
+    outlet_name = data.get("outlet_name")
+    region_name = data.get("region_name")
+    order_api_url = data.get("order_api_url")
+    order_api_key = data.get("order_api_key")
+    
+    # Basic validation: Make sure all required fields are present
+    missing_fields = [
+        name for name, value in[
+            ("outlet_id", outlet_id),
+            ("outlet_name", outlet_name),
+            ("region_name", region_name),
+            ("order_api_url", order_api_url),
+            ("order_api_key", order_api_key),
+        ]
+        if not value
+    ]
+    
+    if missing_fields:
+        return jsonify({
+            "success": False,
+            "error": f"Missing fields:{', '.join(missing_fields)}",
+        }), 400
+    
+    # Call the controller, which will in turn, call the model
+    result = add_outlet(
+        outlet_id=outlet_id,
+        outlet_name=outlet_name,
+        region_name=region_name,
+        order_api_url=order_api_url,
+        order_api_key= order_api_key
+    )
+    
+    if result:
+        return jsonify({
+            "success": result
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "error": "Failed to register to database."
+        }), 400
 
 
 if __name__ == "__main__":
