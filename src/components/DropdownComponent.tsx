@@ -28,8 +28,6 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({onSelect}) =>{
        fetchAllOutlets();
     }, []);
 
-    console.log(localStorage.getItem("admin_token"));
-
     // Debounced search - filter outlets as user types
     useEffect(() =>{
         if (search.trim() === ""){
