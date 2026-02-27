@@ -1,6 +1,7 @@
 import "../styling/ConfigurationStyles.css"
 import DropdownComponent from "../components/DropdownComponent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SERVER_URL= "http://localhost:5000";
 
@@ -8,6 +9,14 @@ export default function ConfigurationForm (){
     const [selectedOutlet, setSelectedOutlet] = useState<{ id: string, name: string, region: string } | null>(null);
     const [accessToken, setAccessToken] = useState<string>("");
     const [loading, setLoading] = useState<boolean>();
+    const navigate = useNavigate();
+
+    const jwt_token = localStorage.getItem("admin_token");
+    useEffect(() =>{
+        if(!localStorage.getItem("admin_token")){
+            navigate("/")
+        }
+    })
 
     const handleOutletSelect = (outletId: string, outletName: string, outletRegion:string) => {
         setSelectedOutlet({ id: outletId, name: outletName, region:outletRegion });
@@ -49,7 +58,10 @@ export default function ConfigurationForm (){
             // Update the credentials
             const response = await fetch(`${SERVER_URL}/api/register_outlet`,{
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer${jwt_token}`
+                },
                 body: JSON.stringify(body),
             });
 
