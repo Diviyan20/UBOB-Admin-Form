@@ -86,7 +86,7 @@ export default function AdminLoginForm() {
 
                     <input 
                     type="submit" 
-                    value={loading? "Loggin In.." : "Submit"}
+                    value={loading? "Logging In.." : "Login"}
                     disabled={loading}/>
                 </form>
             </div>

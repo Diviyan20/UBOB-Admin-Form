@@ -64,7 +64,7 @@ input[type=submit] {
   
 input[type=submit] {
   width: 100%;
-  background-color: #182E6F;
+  background-color: #305CDE;
   color: white;
   padding: 14px 20px;
   margin: 8px 0;
@@ -74,10 +74,11 @@ input[type=submit] {
 }
 
 input[type=submit]:hover:not(:disabled) {
-  background-color: #305CDE;
+  background-color: #182E6F;
+  
 }
 
 input[type=submit]:disabled {
-  background-color: #cccccc;
+  background-color: #000435;
   cursor: not-allowed;
 }
