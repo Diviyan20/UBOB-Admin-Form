@@ -21,10 +21,14 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({onSelect}) =>{
     const [showDropdown, setShowDropdown] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const jwt_token = localStorage.getItem("admin_token");
+
     // Fetch all outlets on mount
     useEffect(() =>{
        fetchAllOutlets();
     }, []);
+
+    console.log(localStorage.getItem("admin_token"));
 
     // Debounced search - filter outlets as user types
     useEffect(() =>{
@@ -50,7 +54,13 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({onSelect}) =>{
     const fetchAllOutlets = async () =>{
         try{
             setLoading(true);
-            const response = await fetch(`${SERVER_URL}/api/outlets`);
+            const response = await fetch(`${SERVER_URL}/api/outlets`, {
+                method:"GET",
+                headers:{
+                    "Content-Type": "application/json",
+                    "Authorization":`Bearer ${jwt_token}`
+                }
+            });
             const data = await response.json();
 
             if(response.ok){
