@@ -8,6 +8,10 @@
 .form-wrapper{
   width: 100%;
   max-width: 400px;
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .error{
@@ -21,6 +25,7 @@
 h2{
   text-align: center;
   margin-bottom: 30px;
+  color: #000;
 }
 
 .form-group{
@@ -34,6 +39,7 @@ label{
   text-align: left;
   margin-top: 10px;
   font-weight: bold;
+  color: #000;
 }
 
 input[type="email"],
@@ -41,9 +47,25 @@ input[type="password"]{
   width: 100%;
   padding: 12px 20px;
   margin: 10px 0;
-  border: 1px solid #ccc;
+  border: 1px;
   border-radius: 4px;
   box-sizing: border-box;
+  background-color: white;
+  color: black;
+  outline:auto;
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+  color: gray; /* Darker placeholder */
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: #305CDE; /* Blue border on focus */
+  color: black;
+  outline:auto;
 }
 
 input[type=submit] {
@@ -59,7 +81,9 @@ input[type=submit] {
   }
 
   input[type=email]:disabled, input[type=password]:disabled {
-    background-color: #f0f0f0;
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+    color: #999;
 }
   
 input[type=submit] {
@@ -67,10 +91,13 @@ input[type=submit] {
   background-color: #305CDE;
   color: white;
   padding: 14px 20px;
-  margin: 8px 0;
+  margin-top: 10px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
 }
 
 input[type=submit]:hover:not(:disabled) {
@@ -81,4 +108,5 @@ input[type=submit]:hover:not(:disabled) {
 input[type=submit]:disabled {
   background-color: #000435;
   cursor: not-allowed;
+  color: #666
 }
