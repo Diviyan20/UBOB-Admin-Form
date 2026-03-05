@@ -1,6 +1,6 @@
 import "../styling/ConfigurationStyles.css"
 import DropdownComponent from "../components/DropdownComponent";
-import { useEffect, useState } from "react";
+import React,{ useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const SERVER_URL = "https://ubob-admin-form.onrender.com";

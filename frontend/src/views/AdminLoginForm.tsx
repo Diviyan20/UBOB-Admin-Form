@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styling/AdminLoginStyles.css"
-import logo from '../assets/Logo.png'
-
 
 const SERVER_URL = "https://ubob-admin-form.onrender.com";
 
@@ -55,7 +53,7 @@ export default function AdminLoginForm() {
     return (
         <div className="container">
             <div className="form-wrapper">
-                <img src={logo} alt="Logo" className="login-logo"/>
+                <img src={"frontend/src/assets/Logo.png"} alt="Logo" className="login-logo"/>
                 <h2>Login as Admin</h2>
 
                 {error && <div className="error">{error}</div>}
