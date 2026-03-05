@@ -4,7 +4,7 @@ import "../styling/AdminLoginStyles.css"
 import logo from '../assets/Logo.png'
 
 
-const SERVER_URL = "https://ubob-admin-form.onrender.com";
+const SERVER_URL = "http://localhost:5000";
 
 export default function AdminLoginForm() {
     const [email, setEmail] = useState("");
