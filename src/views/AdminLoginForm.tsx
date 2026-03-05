@@ -28,17 +28,15 @@ export default function AdminLoginForm() {
 
             const response = await fetch(`${SERVER_URL}/admin/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"},
-                body: JSON.stringify({email, password})
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",   // VERY IMPORTANT
+                body: JSON.stringify({ email, password })
             });
 
             const data = await response.json();
 
-            if (response.ok && data.access_token){
-                localStorage.setItem("admin_token", data.access_token);
+            if (response.ok){
                 navigate("/configuration");
-                
             }
             else{
                 setError(data.error || "Login Failed");

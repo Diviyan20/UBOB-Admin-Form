@@ -11,12 +11,23 @@ export default function ConfigurationForm() {
     const [loading, setLoading] = useState<boolean>();
     const navigate = useNavigate();
 
-    const jwt_token = localStorage.getItem("admin_token");
     useEffect(() => {
-        if (!localStorage.getItem("admin_token")) {
-            navigate("/")
-        }
-    });
+        const checkAuth = async () =>{
+            try{
+                const response = await fetch(`${SERVER_URL}/admin/check-auth`,{
+                    credentials: "include"
+                });
+
+                if(!response.ok){
+                    navigate("/");
+                }
+            }
+            catch{
+                navigate("/");
+            }
+        };
+        checkAuth();
+    },[]);
 
     const handleOutletSelect = (outletId: string, outletName: string, outletRegion: string) => {
         setSelectedOutlet({ id: outletId, name: outletName, region: outletRegion });
@@ -60,8 +71,8 @@ export default function ConfigurationForm() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${jwt_token}`
                 },
+                credentials: "include",
                 body: JSON.stringify(body),
             });
 
@@ -86,10 +97,18 @@ export default function ConfigurationForm() {
         setAccessToken(event.target.value);
     }
 
-    const handleLogout = () => {
-        localStorage.removeItem("admin_token");
-        navigate("/");
-    }
+    const handleLogout = async () => {
+        try {
+            await fetch(`${SERVER_URL}/admin/logout`, {
+                method: "POST",
+                credentials: "include"
+            });
+    
+            navigate("/");
+        } catch {
+            navigate("/");
+        }
+    };
 
     return (
         <div className="container">
