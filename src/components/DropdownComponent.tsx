@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import "../styling/DropdownStyles.css"
 
-const SERVER_URL = "https://ubob-admin-form.onrender.com";
+const SERVER_URL = "http://localhost:5000";
 
 interface Outlet{
     outlet_id: string;
