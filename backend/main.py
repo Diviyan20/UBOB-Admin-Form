@@ -1,16 +1,17 @@
 import logging
-import os
 from dotenv import load_dotenv
 
 # FLASK SERVER
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from datetime import timedelta
 
 # CONTROLLERS
 from controllers.admin_controller import validate_admin_login
 from controllers.outlet_controller import (fetch_all_outlets_from_odoo, add_outlet)
+
+# UTILITIES
+from utils.auth import generate_admin_token
+from utils.decorators import admin_required
 
 # BACKGROUND JOBS
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -23,18 +24,18 @@ CORS(
     app,
     resources={
         r"/*": {
-            "origins": "*",
+            "origins": "http://localhost:5173",
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
         }
     },
+    supports_credentials=True,
 )
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
 # CONFIGURATION
 load_dotenv()
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-jwt = JWTManager(app)
+
 
 
 # =======
@@ -69,22 +70,35 @@ def admin_login():
     if not admin.get("is_valid"):
         return jsonify({"Error": "Invalid Credentials"}), 401
     else:
-        access_token = create_access_token(
-            identity=admin["email"],
-            expires_delta=timedelta(minutes=15)
-        )
+        token = generate_admin_token(admin_id="1")
         
-        return jsonify({
-            "access_token": access_token,
-            "admin_name":admin["name"]
-        }), 200
+        response = make_response(jsonify({"message" :"Login Successful"}))
+        
+        response.set_cookie(
+            "admin_token",
+            token,
+            httponly=True,
+            secure=False,
+            samesite="Strict",
+            max_age=1800
+        )
+        return response
 
+@app.route("/admin/check-auth", methods=["GET"])
+@admin_required
+def check_auth():
+    return jsonify({"authenticated": True})
+
+@app.route("/admin/logout", methods=["POST"])
+def admin_logout():
+    response = make_response(jsonify({"message": "Logged out"}))
+    response.delete_cookie("admin_token")
+    return response
 
 # ==================
 # OUTLET ENDPOINTS
 # ==================
 @app.route("/api/outlets", methods=["GET"])
-@jwt_required()
 def get_all_outlets():
     """Get all the outlets from Odoo for the Dropdown Component"""    
     outlets = fetch_all_outlets_from_odoo()
@@ -98,14 +112,9 @@ def get_all_outlets():
         }), 405
 
 @app.route("/api/register_outlet", methods=["POST"])
-@jwt_required()
+@admin_required
 def register_outlet():
-    """ Register a new outlet into the database """
-    
-    # Authenthication for Admin using JWT Token
-    admin_id = get_jwt_identity()
-    log.info(f"Admin {admin_id} is registering an outlet.")
-    
+    """ Register a new outlet into the database """    
     data = request.get_json(force=True)
     
     outlet_id = data.get("outlet_id")
