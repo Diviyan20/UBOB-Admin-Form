@@ -50,33 +50,35 @@ def admin_login():
     """
     Validate admin credentials via XML-RPC (Temporary)
     """
-    data = request.get_json(force=True)
+    if request.method == "OPTIONS":
+        return "", 200
+
+    data = request.get_json()
     email = data.get("email")
     password = data.get("password")
-    
-    # Validate input
+
     if not email or not password:
         return jsonify({"error": "Missing email or password"}), 400
-    
-    # Validate credentials
+
     admin = validate_admin_login(email, password)
-    
+
     if not admin.get("is_valid"):
-        return jsonify({"Error": "Invalid Credentials"}), 401
-    else:
-        token = generate_admin_token(admin_id="1")
-        
-        response = make_response(jsonify({"message" :"Login Successful"}))
-        
-        response.set_cookie(
-            "admin_token",
-            token,
-            httponly=True,
-            secure=True,
-            samesite="None",
-            max_age=1800
-        )
-        return response
+        return jsonify({"error": "Invalid Credentials"}), 401
+
+    token = generate_admin_token(admin_id="1")
+
+    response = make_response(jsonify({"message": "Login Successful"}))
+
+    response.set_cookie(
+        "admin_token",
+        token,
+        httponly=True,
+        secure=True,
+        samesite="None",
+        max_age=1800
+    )
+
+    return response
 
 @app.route("/admin/check-auth", methods=["GET"])
 @admin_required
