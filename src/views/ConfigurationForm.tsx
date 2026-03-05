@@ -12,11 +12,11 @@ export default function ConfigurationForm() {
     const navigate = useNavigate();
 
     const jwt_token = localStorage.getItem("admin_token");
-     useEffect(() =>{
-         if(!localStorage.getItem("admin_token")){
-             navigate("/")
-         }
-     });
+    useEffect(() => {
+        if (!localStorage.getItem("admin_token")) {
+            navigate("/")
+        }
+    });
 
     const handleOutletSelect = (outletId: string, outletName: string, outletRegion: string) => {
         setSelectedOutlet({ id: outletId, name: outletName, region: outletRegion });
@@ -114,7 +114,12 @@ export default function ConfigurationForm() {
 
                     <div className="form-group">
                         <label htmlFor="order_url">Preparation Screen URL</label>
-                        <input id="order_url" value={baseUrl} readOnly={true} />
+                        <textarea
+                            id="order_url"
+                            value={baseUrl}
+                            readOnly
+                            className="order-url-field"
+                        />
                     </div>
 
                     <div className="form-group">
