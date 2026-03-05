@@ -22,14 +22,8 @@ app = Flask(__name__, static_folder="static")
 
 CORS(
     app,
-    resources={
-        r"/*": {
-            "origins": "https://ubob-admin-form.vercel.app/",
-            "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-        }
-    },
-    supports_credentials=True,
+    origins=["https://ubob-admin-form.vercel.app"],
+    supports_credentials=True
 )
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
@@ -78,8 +72,8 @@ def admin_login():
             "admin_token",
             token,
             httponly=True,
-            secure=False,
-            samesite="Strict",
+            secure=True,
+            samesite="None",
             max_age=1800
         )
         return response
