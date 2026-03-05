@@ -53,7 +53,7 @@ export default function AdminLoginForm() {
     return (
         <div className="container">
             <div className="form-wrapper">
-                <img src={"frontend/src/assets/Logo.png"} alt="Logo" className="login-logo"/>
+                <img src={"frontend/public/Logo.png"} alt="Logo" className="login-logo"/>
                 <h2>Login as Admin</h2>
 
                 {error && <div className="error">{error}</div>}
