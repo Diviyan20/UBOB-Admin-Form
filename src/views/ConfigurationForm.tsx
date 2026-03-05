@@ -3,7 +3,7 @@ import DropdownComponent from "../components/DropdownComponent";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const SERVER_URL = "http://localhost:5000";
+const SERVER_URL = "https://ubob-admin-form.onrender.com";
 
 export default function ConfigurationForm() {
     const [selectedOutlet, setSelectedOutlet] = useState<{ id: string, name: string, region: string } | null>(null);
