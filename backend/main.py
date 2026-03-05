@@ -24,7 +24,7 @@ CORS(
     app,
     resources={
         r"/*": {
-            "origins": "http://localhost:5173",
+            "origins": "https://ubob-admin-form.vercel.app/",
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
         }
@@ -51,7 +51,7 @@ log = logging.getLogger(__name__)
 # ===================
 # ADMIN ENDPOINTS
 # ===================
-@app.route("/admin/login", methods=["POST"])
+@app.route("/admin/login", methods=["POST", "OPTIONS"])
 def admin_login():
     """
     Validate admin credentials via XML-RPC (Temporary)
