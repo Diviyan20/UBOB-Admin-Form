@@ -15,6 +15,7 @@ export default function ConfigurationForm() {
         const checkAuth = async () =>{
             try{
                 const response = await fetch(`${SERVER_URL}/admin/check-auth`,{
+                    method:"GET",
                     credentials: "include"
                 });
 
