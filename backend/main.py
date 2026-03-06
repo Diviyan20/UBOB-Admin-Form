@@ -22,7 +22,7 @@ app = Flask(__name__, static_folder="static")
 
 CORS(
     app,
-    origins=["https://ubob-admin-form.vercel.app"],
+    origins=["https://ubob-admin-form-1.onrender.com"],
     supports_credentials=True
 )
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
