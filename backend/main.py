@@ -62,7 +62,7 @@ def admin_login():
 
     admin = validate_admin_login(email, password)
 
-    if not admin.get("is_valid"):
+    if not admin:
         return jsonify({"error": "Invalid Credentials"}), 401
 
     token = generate_admin_token(admin_id="1")
