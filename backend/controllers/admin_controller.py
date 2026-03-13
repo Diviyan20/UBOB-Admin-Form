@@ -1,7 +1,7 @@
 import logging
 import os
-import xmlrpc.client
 from dotenv import load_dotenv
+from models.admin_credentials import retrieve_credentials
 
 
 load_dotenv()
@@ -37,51 +37,8 @@ def validate_admin_login(email:str, password: str)-> dict:
     try:
         log.info(f"Validating email for {email}")
         
-        # Connect to Odoo XML-RPC client endpoint
-        common = common = xmlrpc.client.ServerProxy(f"{ODOO_DATABASE_URL}/xmlrpc/2/common")
-        common.version()
+        result = retrieve_credentials(email, password)
         
-        # Try to authenticate
-        uid = common.authenticate(ODOO_DATABASE_NAME, email, password,{})
-        
-        if uid:
-            # Authentication successful, get user details
-            models = xmlrpc.client.ServerProxy(f"{ODOO_DATABASE_URL}/xmlrpc/2/object")
-            
-            # Read user data
-            user_data = models.execute_kw(
-                ODOO_DATABASE_NAME, uid, password,
-                'res.users', 'read',
-                [uid],
-                {'fields':['name', 'login', 'email']}
-            )
-            
-            if user_data:
-                user = user_data[0]
-                log.info(f"Login successful for {email}")
-                return{
-                    "is_valid": True,
-                    "user_id": uid,
-                    "name": user.get("name", "Admin"),
-                    "email": user.get("login", email)
-                }
-        else:
-            log.error(f"Invalid credentials for {email}")
-            return{
-                "is_valid": False,
-                "error": "Invalid email or password."
-            }
-    
-    except xmlrpc.client.Fault as e:
-        log.error(f"XML-RPC Fault: {e}")
-        return{
-            "is_valid": False,
-            "error": "Invalid credentials"
-        }
-    
+        return result
     except Exception as e:
         log.error(f"Error: {e}")
-        return{
-            "is_valid": False,
-            "error": "Authentication Failed."
-        }
