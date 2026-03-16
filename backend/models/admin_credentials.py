@@ -1,5 +1,6 @@
 import os
 import psycopg2
+import psycopg2.extras
 import logging
 import bcrypt
 from dotenv import load_dotenv
@@ -38,7 +39,7 @@ def get_db_connection():
             port = DB_PORT
         )
         
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictConnection)
     
         yield conn, cur
     
