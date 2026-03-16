@@ -60,7 +60,7 @@ def retrieve_credentials(email, password):
         with get_db_connection() as (conn, cur):
         
             query = """SELECT email, password FROM admin_credentials WHERE email=%s;"""
-            cur.execute(query, (email),)
+            cur.execute(query, (email,))
             row = cur.fetchone()
             
             if not row:
