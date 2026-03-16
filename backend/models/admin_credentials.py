@@ -1,6 +1,5 @@
 import os
 import psycopg2
-import psycopg2.extras
 import logging
 import bcrypt
 from dotenv import load_dotenv
@@ -39,7 +38,7 @@ def get_db_connection():
             port = DB_PORT
         )
         
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictConnection)
+        cur = conn.cursor()
     
         yield conn, cur
     
@@ -66,7 +65,7 @@ def retrieve_credentials(email, password):
             
             if not row:
                 return None
-            stored_hash = row["password"]
+            stored_hash = row[2]
             
             # Compare plaintext password against the stored hash
             if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
