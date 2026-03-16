@@ -65,7 +65,7 @@ def retrieve_credentials(email, password):
             
             if not row:
                 return None
-            stored_hash = row[2]
+            stored_hash = row[1]
             
             # Compare plaintext password against the stored hash
             if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
