@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import logging
+import bcrypt
 from dotenv import load_dotenv
 from contextlib import contextmanager
 
@@ -58,9 +59,19 @@ def retrieve_credentials(email, password):
     try:
         with get_db_connection() as (conn, cur):
         
-            query = """SELECT email, password FROM admin_credentials WHERE email=%s AND password=%s;"""
-            cur.execute(query, (email,password))
-            record = cur.fetchone()
-            return record
+            query = """SELECT email, password FROM admin_credentials WHERE email=%s;"""
+            cur.execute(query, (email),)
+            row = cur.fetchone()
+            
+            if not row:
+                return None
+            stored_hash = row["password"]
+            
+            # Compare plaintext password against the stored hash
+            if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
+                return row  # Valid
+            else:
+                return None  # Wrong password
+            
     except psycopg2.Error as e:
         log.error(f"Database Error: {e}")
