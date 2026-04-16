@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 # FLASK SERVER
 from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
+from mangum import Mangum
 
 # CONTROLLERS
 from controllers.admin_controller import validate_admin_login
@@ -156,6 +157,6 @@ def register_outlet():
             "error": "Failed to register to database."
         }), 400
 
-
+handler = Mangum(app)
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
