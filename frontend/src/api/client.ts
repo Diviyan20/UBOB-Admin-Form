@@ -4,7 +4,7 @@ const SERVER_URL =
 export const api = {
   login: `${SERVER_URL}/admin/login`,
   logout: `${SERVER_URL}/admin/logout`,
-  outletInfo: (outletId: string) => `${SERVER_URL}/outlet_info/${outletId}`,  
+  outlet_info: `${SERVER_URL}/api/outlets`,  
   register_outlet: `${SERVER_URL}/api/register_outlet`,
   check_auth: `${SERVER_URL}/admin/check-auth`,
 
