@@ -10,11 +10,17 @@ export default function ConfigurationForm() {
     const [loading, setLoading] = useState<boolean>();
     const navigate = useNavigate();
 
+    const token = localStorage.getItem("admin_token");
+
     useEffect(() => {
         const checkAuth = async () =>{
             try{
                 const response = await fetch(api.check_auth,{
                     method:"GET",
+                    headers:{
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
                     credentials: "include"
                 });
 

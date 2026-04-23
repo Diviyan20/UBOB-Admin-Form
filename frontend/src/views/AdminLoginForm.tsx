@@ -35,6 +35,7 @@ export default function AdminLoginForm() {
             const data = await response.json();
 
             if (response.ok){
+                localStorage.setItem("admin_token", data.token);
                 navigate("/configuration");
             }
             else{
