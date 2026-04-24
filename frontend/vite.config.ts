@@ -5,7 +5,4 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: "./",
-  define:{
-    'process.env.VITE_ORDER_TRACKING_URL':JSON.stringify(process.env.VITE_ORDER_TRACKING_URL)
-  }
 })

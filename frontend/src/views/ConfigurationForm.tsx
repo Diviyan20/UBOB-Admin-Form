@@ -21,7 +21,6 @@ export default function ConfigurationForm() {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
-                    credentials: "include"
                 });
 
                 if(!response.ok){
@@ -77,8 +76,8 @@ export default function ConfigurationForm() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
-                credentials: "include",
                 body: JSON.stringify(body),
             });
 
@@ -107,11 +106,17 @@ export default function ConfigurationForm() {
         try {
             await fetch(api.logout, {
                 method: "POST",
-                credentials: "include"
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
     
             navigate("/");
         } catch {
+            //ignore
+        }
+        finally{
+            localStorage.removeItem("admin_token");
             navigate("/");
         }
     };

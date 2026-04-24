@@ -5,7 +5,7 @@ export const api = {
   login: `${SERVER_URL}/admin/login`,
   logout: `${SERVER_URL}/admin/logout`,
   outlet_info: `${SERVER_URL}/api/outlets`,  
-  register_outlet: `${SERVER_URL}/api/register_outlet`,
+  register_outlet: `${SERVER_URL}/admin/register_outlet`,
   check_auth: `${SERVER_URL}/admin/check-auth`,
 
   videos: (outletId: string) => `${SERVER_URL}/videos/${outletId}`,
