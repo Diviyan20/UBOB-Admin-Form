@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styling/AdminLoginStyles.css"
 import logo from "../assets/Logo.png"
+import { api } from "../api/client";
 
-const SERVER_URL = "https://ubob-admin-form.onrender.com";
 
 export default function AdminLoginForm() {
     const [email, setEmail] = useState("");
@@ -25,16 +25,16 @@ export default function AdminLoginForm() {
         try{
             setLoading(true);
 
-            const response = await fetch(`${SERVER_URL}/admin/login`, {
+            const response = await fetch(api.login, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include",   // VERY IMPORTANT
                 body: JSON.stringify({ email, password })
             });
 
             const data = await response.json();
 
             if (response.ok){
+                localStorage.setItem("admin_token", data.token);
                 navigate("/configuration");
             }
             else{
