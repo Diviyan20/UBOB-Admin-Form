@@ -1,44 +1,77 @@
-import logging
-import os
-from dotenv import load_dotenv
+from flask import Blueprint, jsonify, make_response, request
+from models.active_outlets import register_outlet
 from models.admin_credentials import retrieve_credentials
+from utils.auth import generate_admin_token
+from utils.decorators import admin_required
 
+admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
-load_dotenv()
-
-# ENVIRONMENT VARIABLE CONFIGURATION
-ODOO_DATABASE_URL = os.getenv("ODOO_DATABASE_URL")
-ODOO_API_TOKEN = os.getenv("ODOO_API_TOKEN")
-ODOO_DATABASE_NAME = os.getenv("ODOO_DATABASE_NAME")
-
-# LOGGING
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s",
-    datefmt="%H:%M:%S",
-)
-
-log = logging.getLogger(__name__)
-
-def odoo_headers():
-    """Generate headers for the Odoo API requests"""
-    return {
-        "Authorization": f"Bearer {ODOO_API_TOKEN}",
-        "Content-Type": "application/json"
-    }
-
-def validate_admin_login(email:str, password: str)-> dict:
-    """
-    Validate admin credentials using Odoo XML-RPC.
+@admin_bp.route("/login", methods=["POST"])
+def admin_login():
+    data = request.get_json(silent=True, force=True)
+        
+    print("RAW BODY:", request.data)
+    print("HEADERS:", dict(request.headers))
     
-    This fetches all users and checks if email and password match.
-    Note: This is temporary until a secure authentication endpoint is available.
-    """
-    try:
-        log.info(f"Validating email for {email}")
-        
-        result = retrieve_credentials(email, password)
-        
-        return result
-    except Exception as e:
-        log.error(f"Error: {e}")
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON"}), 400
+
+    email = data.get("email")
+    password = data.get("password")
+    
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
+    admin = retrieve_credentials(email, password)
+
+    if not admin:
+        return jsonify({"error": "Invalid Credentials"}), 401
+
+    token = generate_admin_token(admin_id="1")
+
+    return jsonify({"message": "Login Successful", "token": token}), 200
+
+@admin_bp.route("/check-auth", methods=["GET"])
+@admin_required
+def check_auth():
+    return jsonify({"authenticated": True})
+
+@admin_bp.route("/logout", methods=["POST"])
+def admin_logout():
+    response = make_response(jsonify({"message": "Logged out"}))
+    response.delete_cookie("admin_token")
+    return response
+
+@admin_bp.route("/register_outlet", methods=["POST"])
+def admin_register_outlet():
+    data = request.get_json(silent=True, force=True)
+    
+    print("RAW BODY:", request.data)
+    print("HEADERS:", dict(request.headers))
+    
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON"}), 400
+    
+    outlet_id = data.get("outlet_id")
+    outlet_name = data.get("outlet_name")
+    region_name = data.get("region_name")
+    order_api_url = data.get("order_api_url")
+    order_api_key = data.get("order_api_key")
+    tier = data.get("tier")
+    
+    if not all([outlet_id, outlet_name, region_name, order_api_url, order_api_key, tier]):
+        return jsonify({"error": "All fields are required"}), 400
+
+    result = register_outlet(
+        outlet_id=outlet_id,
+        outlet_name=outlet_name,
+        region_name=region_name,
+        order_api_url=order_api_url,
+        order_api_key=order_api_key,
+        tier = tier
+    )
+
+    if not result.get("success"):
+        return jsonify({"error": result.get("error", "Registration failed")}), 409
+
+    return jsonify(result), 201

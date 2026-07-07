@@ -1,11 +1,11 @@
+import json
 import os
-import psycopg2
-import logging
-import bcrypt
-from dotenv import load_dotenv
 from contextlib import contextmanager
 
-load_dotenv()
+import bcrypt
+import boto3
+import psycopg2
+from flask import jsonify
 
 # ENVIRONMENT VARIABLES
 OUTLET_DATABASE = os.getenv("OUTLET_DATABASE")
@@ -14,26 +14,31 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOSTNAME = os.getenv("DB_HOSTNAME")
 DB_PORT = os.getenv("DB_PORT")
 
-# ================
-# LOGGING SETUP
-# ================
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s",
-    datefmt="%H:%M:%S",
-)
-log = logging.getLogger(__name__)
-
+def get_db_credentials():
+    secret_arn = os.getenv("DB_SECRET_ARN")
+    
+    client = boto3.client("secretsmanager")
+    
+    response = client.get_secret_value(SecretId=secret_arn)
+    secret = json.loads(response["SecretString"])
+    
+    return{
+        "username":secret["username"],
+        "password":secret["password"]
+    }
+    
 @contextmanager
 def get_db_connection():
     """Connect to the database with Environment Variables using psycopg2"""
+    creds = get_db_credentials()
     conn = None
     cur = None
     try:
+        
         conn = psycopg2.connect(
             database = OUTLET_DATABASE,
-            user = DB_USERNAME,
-            password = DB_PASSWORD,
+            user = creds["username"],
+            password = creds["password"],
             host = DB_HOSTNAME,
             port = DB_PORT
         )
@@ -44,11 +49,13 @@ def get_db_connection():
     
     # Error handling for Connection Error
     except psycopg2.Error as e:
-        log.error(f"Database connection Error: {e}")
         if conn:
             conn.rollback()
-        raise
-
+        return jsonify({
+            "error": "Database connection error",
+            "message": str(e)
+        })
+        
     finally:
         if cur:
             cur.close()
@@ -74,4 +81,7 @@ def retrieve_credentials(email, password):
                 return None  # Wrong password
             
     except psycopg2.Error as e:
-        log.error(f"Database Error: {e}")
+        return jsonify({
+            "error": "Database Error",
+            "message": str(e)
+        })
