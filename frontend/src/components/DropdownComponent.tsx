@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import React from "react";
+import { api } from "../api/client";
 import "../styling/DropdownStyles.css"
-
-const SERVER_URL = "https://ubob-admin-form.onrender.com";
 
 interface Outlet{
     outlet_id: string;
@@ -52,13 +51,12 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({onSelect}) =>{
     const fetchAllOutlets = async () =>{
         try{
             setLoading(true);
-            const response = await fetch(`${SERVER_URL}/api/outlets`, {
+            const response = await fetch(api.outlet_info, {
                 method:"GET",
                 headers:{
                     "Content-Type": "application/json",
                     "Authorization":`Bearer ${jwt_token}`
-                },
-                credentials:"include"
+                }
             });
             const data = await response.json();
 

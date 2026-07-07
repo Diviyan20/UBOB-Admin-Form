@@ -2,8 +2,7 @@ import "../styling/ConfigurationStyles.css"
 import DropdownComponent from "../components/DropdownComponent";
 import React,{ useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const SERVER_URL = "https://ubob-admin-form.onrender.com";
+import { api } from "../api/client";
 
 export default function ConfigurationForm() {
     const [selectedOutlet, setSelectedOutlet] = useState<{ id: string, name: string, region: string } | null>(null);
@@ -11,12 +10,17 @@ export default function ConfigurationForm() {
     const [loading, setLoading] = useState<boolean>();
     const navigate = useNavigate();
 
+    const token = localStorage.getItem("admin_token");
+
     useEffect(() => {
         const checkAuth = async () =>{
             try{
-                const response = await fetch(`${SERVER_URL}/admin/check-auth`,{
+                const response = await fetch(api.check_auth,{
                     method:"GET",
-                    credentials: "include"
+                    headers:{
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
                 });
 
                 if(!response.ok){
@@ -68,12 +72,12 @@ export default function ConfigurationForm() {
             }
 
             // Update the credentials
-            const response = await fetch(`${SERVER_URL}/api/register_outlet`, {
+            const response = await fetch(api.register_outlet, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
-                credentials: "include",
                 body: JSON.stringify(body),
             });
 
@@ -100,13 +104,19 @@ export default function ConfigurationForm() {
 
     const handleLogout = async () => {
         try {
-            await fetch(`${SERVER_URL}/admin/logout`, {
+            await fetch(api.logout, {
                 method: "POST",
-                credentials: "include"
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
     
             navigate("/");
         } catch {
+            //ignore
+        }
+        finally{
+            localStorage.removeItem("admin_token");
             navigate("/");
         }
     };
