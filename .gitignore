@@ -23,8 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
-# Virtual Environments
+# Virtual Environments and layer-builds
 /env
+backend/layer-build
 
 # Environment Variables
 .env
+
+# Tools
+backend/password_hasher.py
+backend/request_size.py
