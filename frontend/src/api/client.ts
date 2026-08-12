@@ -1,12 +1,14 @@
 const SERVER_URL =
   "https://wp6gcj3019.execute-api.ap-southeast-5.amazonaws.com";
 
-export const api = {
-  login: `${SERVER_URL}/admin/login`,
-  logout: `${SERVER_URL}/admin/logout`,
-  outlet_info: `${SERVER_URL}/api/outlets`,  
-  register_outlet: `${SERVER_URL}/admin/register_outlet`,
-  check_auth: `${SERVER_URL}/admin/check-auth`,
+  const DEVELOPMENT_URL = "https://kcs4utnpog.execute-api.ap-southeast-5.amazonaws.com";
 
-  videos: (outletId: string) => `${SERVER_URL}/videos/${outletId}`,
+export const api = {
+  login: `${DEVELOPMENT_URL}/admin/login`,
+  logout: `${DEVELOPMENT_URL}/admin/logout`,
+  outlet_info: `${DEVELOPMENT_URL}/api/outlets`,  
+  register_outlet: `${DEVELOPMENT_URL}/admin/register_outlet`,
+  check_auth: `${DEVELOPMENT_URL}/admin/check-auth`,
+
+  videos: (outletId: string) => `${DEVELOPMENT_URL}/videos/${outletId}`,
 };
