@@ -6,7 +6,8 @@ const SERVER_URL =
 export const api = {
   login: `${DEVELOPMENT_URL}/admin/login`,
   logout: `${DEVELOPMENT_URL}/admin/logout`,
-  outlet_info: `${DEVELOPMENT_URL}/api/outlets`,  
+  outlet_info: `${DEVELOPMENT_URL}/api/outlets`,
+  outlets:`${DEVELOPMENT_URL}/admin/outlets`,
   register_outlet: `${DEVELOPMENT_URL}/admin/register_outlet`,
   check_auth: `${DEVELOPMENT_URL}/admin/check-auth`,
 
