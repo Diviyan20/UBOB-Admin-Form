@@ -1,0 +1,165 @@
+.outlet-dashboard {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    color: #1f2937;
+}
+
+/* Header */
+
+.outlet-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.outlet-dashboard-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #f9f9f9;
+}
+
+/* Buttons */
+
+.outlet-dashboard-header button,
+.outlet-dashboard button {
+    padding: 9px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.outlet-dashboard-header button:hover,
+.outlet-dashboard button:hover {
+    background-color: #f3f4f6;
+}
+
+/* Table */
+
+.outlet-table-container {
+    width: 100%;
+    overflow-x: auto;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.outlet-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    color: #374151;
+}
+
+/* Table Header */
+
+.outlet-table thead {
+    background-color: #f3f4f6;
+}
+
+.outlet-table th {
+    padding: 13px 16px;
+    border-bottom: 2px solid #e5e7eb;
+    color: #374151;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* Table Body */
+
+.outlet-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.outlet-table tbody tr {
+    background-color: #ffffff;
+}
+
+.outlet-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.outlet-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status */
+
+.outlet-status {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.outlet-status.online {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.outlet-status.offline {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Null values */
+
+.null-value {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* Loading */
+
+.outlet-dashboard-loading {
+    padding: 40px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 15px;
+}
+
+/* Error */
+
+.outlet-dashboard-error {
+    padding: 24px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #991b1b;
+}
+
+.outlet-dashboard-error button {
+    margin-top: 12px;
+    border: none;
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.outlet-dashboard-error button:hover {
+    background-color: #b91c1c;
+}
+
+/* Empty */
+
+.empty-state {
+    padding: 40px;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #6b7280;
+}
