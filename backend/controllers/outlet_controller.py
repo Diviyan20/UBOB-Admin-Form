@@ -9,10 +9,10 @@ Handles:
 
 from flask import Blueprint, jsonify, request
 from models.active_outlets import (
-    get_outlet_information,
+    get_outlet_info,
     update_heartbeat_status,
 )
-from services.outlet_service import fetch_all_outlet_data, fetch_registered_outlets
+from services.outlet_service import fetch_all_outlet_data
 
 # ===================
 # CREATE BLUEPRINT
@@ -37,7 +37,7 @@ def validate_outlet_route():
     if not outlet_id:
         return jsonify({"is_valid": False, "message": "outlet_id is required"}), 400
     
-    outlet = get_outlet_information(outlet_id) # Fetch all outlets
+    outlet = get_outlet_info(outlet_id) # Fetch all outlets
     
     if not outlet:
         return jsonify({
@@ -70,24 +70,6 @@ def get_all_outlets():
             "error": f"Failed to fetch outlets: {e}"
         }), 500
 
-@outlet_bp.route("/outlets", methods=["GET"])
-def get_all_outlets(outlet_id):
-    """
-    Returns all registered outlets from the database.
-    """
-    try:
-        outlets = fetch_registered_outlets()
-        return jsonify({
-            "success": True,
-            "outlets": outlets
-        }), 200
-        
-    except Exception as e:
-        return jsonify({
-            "success": False,
-            "error": f"Failed to fetch registered outlets: {e}"
-        }), 500
-
 # ========================
 # GET SINGLE OUTLET INFO
 # ========================
@@ -97,7 +79,7 @@ def outlet_info(outlet_id):
     Returns information for one outlet
     """
     try:
-        outlet = get_outlet_information(outlet_id)
+        outlet = get_outlet_info(outlet_id)
         
         if not outlet:
             return jsonify({

@@ -104,6 +104,87 @@ def get_outlet_info(outlet_id: str) -> dict:
     except Exception as e:
         log.error(f"Database Error: {e}")
 
+def get_all_outlets() -> dict:
+    try:
+        with get_db_connection() as (conn, cur):
+            query = "SELECT * FROM active_outlets ORDER BY outlet_id ASC;"
+        
+            cur.execute(query)
+            
+            outlets = cur.fetchall()
+            
+            if not outlets:
+                return []
+            
+            return[{
+                "outlet_id": outlet[0],
+                "outlet_name": outlet[1],
+                "outlet_status": outlet[2],
+                "outlet_location": outlet[3],
+                "active": outlet[4],
+                "last_seen": outlet[5],
+                "order_api_url": outlet[6],
+                "order_api_key": outlet[7],
+                "tier": outlet[8],
+            }
+                   for outlet in outlets
+            ]
+        
+    except Exception as e:
+        raise ValueError(f"Error fetching outlets: {e}")
+        
+def update_heartbeat_status(outlet_id: str, status: str):
+    """
+    Update the heartbeat status of an active outlet.
+    """
+    try:
+        with get_db_connection() as (conn, cur):
+            now = datetime.now(timezone.utc)
+            
+            # Make sure status is valid
+            if status.lower() not in ("online", "offline"):
+                status = "online"
+            
+            query = """
+                    UPDATE active_outlets 
+                    SET outlet_status = %s, last_seen = %s
+                    WHERE outlet_id = %s
+                    RETURNING outlet_id
+                """
+            cur.execute(query, (status.lower(), now, outlet_id))
+            result = cur.fetchone()
+            conn.commit()
+            
+            if result:
+                print(f"✅ Heartbeat updated for outlet {outlet_id}: {status}")
+                return True
+            else:
+                print(f"❌ Outlet {outlet_id} not found in database")
+                return False
+    
+    except Exception as e:
+        raise ValueError(f"Error Updating Heartbeat for Outlet {outlet_id}: {e}")    
+
+def search_online_devices():
+    with get_db_connection() as (conn, cur):
+        query = """
+            SELECT outlet_id, last_seen
+            FROM active_outlets
+            WHERE outlet_status = 'online'
+        """
+        cur.execute(query)
+        return cur.fetchall()
+
+def mark_device_offline(outlet_id):
+    with get_db_connection() as (conn, cur):
+        query = """
+                UPDATE active_outlets
+                SET outlet_status = 'offline'
+                WHERE outlet_id = %s
+            """
+        cur.execute(query,(outlet_id,))
+        conn.commit()
+
 def register_outlet(outlet_id:str, outlet_name:str, region_name:str, 
                     order_api_url:str, order_api_key:str, tier: str):
     """
