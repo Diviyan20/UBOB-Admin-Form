@@ -4,7 +4,6 @@ from pathlib import Path
 
 import requests
 from flask import jsonify
-from models.active_outlets import get_all_outlets
 
 CACHE_ROOT = Path(os.getenv("CACHE_ROOT", "/tmp/digital-signage-cache"))
 CACHE_DIR = CACHE_ROOT / "outlets"
@@ -50,7 +49,7 @@ def fetch_all_outlet_data() -> List:
         data = response.json()
         
         if not data.get("status"):
-            return jsonify({"erro": "Odoo API Error"}), []
+            return jsonify({"error": "Odoo API Error"}), []
         
         else:
             # Extract all outlet data
@@ -68,14 +67,3 @@ def fetch_all_outlet_data() -> List:
             return outlets
     except Exception as e:
         return jsonify({"error": str(e)}),[]
-
-def fetch_registered_outlets() -> list:
-    """
-    Fetches all registered outlets from the database.
-    Returns a list of dictionaries containing outlet information.
-    """
-    try:
-        outlets = get_all_outlets()
-        return outlets
-    except Exception as e:
-        raise ValueError(f"Error fetching registered outlets: {e}")
