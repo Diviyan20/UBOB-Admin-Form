@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllOutlets } from "../../services/OutletService";
+import { getAllOutlets } from "../../services/outlet/OutletService";
 import type { Outlet } from "../../types/Outlet";
 import "../../styling/OutletDashboardStyles.css";
 import type { UUID } from "crypto";

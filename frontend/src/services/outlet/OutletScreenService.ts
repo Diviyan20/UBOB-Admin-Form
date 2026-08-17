@@ -1,5 +1,5 @@
-import { api } from "../api/client";
-import type { CreateOutletScreenPayload, OutletScreen, UpdateOutletScreenPayload } from "../types/OutletScreen";
+import { api } from "../../api/client";
+import type { CreateOutletScreenPayload, OutletScreen, UpdateOutletScreenPayload } from "../../types/OutletScreen";
 
 interface GetAllOutletScreensResponse{
     success: boolean;

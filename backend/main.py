@@ -7,6 +7,7 @@ from controllers.outlet_image_controller import outlet_image_bp
 from controllers.outlet_screen_controller import outlet_screen_bp
 from controllers.playlist_controller import playlist_bp
 from controllers.promotion_controller import promotion_bp
+from controllers.media_library_controller import media_library_bp
 from controllers.system_config_controller import system_config_bp
 from flask import Flask
 from flask_cors import CORS
@@ -23,6 +24,7 @@ app.register_blueprint(outlet_image_bp)
 app.register_blueprint(outlet_screen_bp)
 app.register_blueprint(promotion_bp)
 app.register_blueprint(playlist_bp)
+app.register_blueprint(media_library_bp)
 app.register_blueprint(system_config_bp)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s", datefmt="%H:%M:%S")
