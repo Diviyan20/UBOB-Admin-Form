@@ -182,7 +182,7 @@ def delete_outlet_screen(screen_id: str) -> dict:
             query = "DELETE FROM outlet_screens WHERE screen_id = %s RETURNING screen_id;"
             cur.execute(query, [screen_id])
             result = cur.fetchone()
-            conn.commit
+            conn.commit()
             
             if not result:
                 return {"success": False, "error": "Screen not found"}
@@ -193,7 +193,3 @@ def delete_outlet_screen(screen_id: str) -> dict:
         log.error(f"Failed to delete outlet screen {screen_id}: {e}")
         conn.rollback()
         return {"success": False, "error": str(e)}
-
-    finally:
-        cur.close()
-        conn.close()
