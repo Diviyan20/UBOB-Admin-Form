@@ -4,6 +4,7 @@ import AdminLoginForm from './views/forms/AdminLoginForm'
 import ConfigurationForm from './views/forms/ConfigurationForm'
 import OutletDashboard from './views/dashboards/OutletDashboard'
 import OutletScreenConfiguration from './components/OutletScreenConfiguration'
+import MediaLibrary from './components/MediaLibrary'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/configuration" element={<ConfigurationForm/>}></Route>
       <Route path="/outlet-dashboard" element={<OutletDashboard/>}></Route>
       <Route path="/outlet-screen" element={<OutletScreenConfiguration/>}></Route>
+      <Route path="/media-library" element={<MediaLibrary/>}></Route>
     </Routes>
     </BrowserRouter>
   )

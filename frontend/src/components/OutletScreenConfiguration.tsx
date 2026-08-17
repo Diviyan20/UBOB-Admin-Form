@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { getAllOutlets } from "../services/OutletService";
+import { getAllOutlets } from "../services/outlet/OutletService";
 
 import {
   createOutletScreen,
   deleteOutletScreen,
   getAllOutletScreens,
   updateOutletScreen,
-} from "../services/OutletScreenService";
+} from "../services/outlet/OutletScreenService";
 import type { Outlet } from "../types/Outlet";
 import type {
   Orientation,

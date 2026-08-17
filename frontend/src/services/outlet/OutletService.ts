@@ -1,5 +1,5 @@
-import { api } from "../api/client";
-import type { Outlet } from "../types/Outlet";
+import { api } from "../../api/client";
+import type { Outlet } from "../../types/Outlet";
 
 interface GetAllOutletsResponse{
     success: boolean;
