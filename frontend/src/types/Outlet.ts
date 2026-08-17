@@ -1,3 +1,5 @@
+import type { UUID } from "crypto";
+
 export interface Outlet {
     outlet_id: number;
     outlet_name: string | null;
@@ -8,4 +10,5 @@ export interface Outlet {
     order_api_url: string | null;
     order_api_key: string | null;
     tier: string | null;
+    uuid: UUID | null;
 }
