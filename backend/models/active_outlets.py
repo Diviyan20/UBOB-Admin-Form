@@ -126,6 +126,7 @@ def get_all_outlets() -> dict:
                 "order_api_url": outlet[6],
                 "order_api_key": outlet[7],
                 "tier": outlet[8],
+                "uuid": outlet[9]
             }
                    for outlet in outlets
             ]

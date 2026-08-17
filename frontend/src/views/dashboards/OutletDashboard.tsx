@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { getAllOutlets } from "../../services/OutletService";
 import type { Outlet } from "../../types/Outlet";
 import "../../styling/OutletDashboardStyles.css";
+import type { UUID } from "crypto";
 
-function displayValue(value: string | number | null | undefined): string {
+function displayValue(value: string | number | UUID | null | undefined): string {
     if (value === null || value === undefined || value === "") {
         return "Null";
     }
@@ -83,7 +84,7 @@ export default function OutletDashboard() {
 
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>UUID</th>
                                 <th>Outlet ID</th>
                                 <th>Outlet Name</th>
                                 <th>Outlet Location</th>
@@ -96,11 +97,11 @@ export default function OutletDashboard() {
                         </thead>
 
                         <tbody>
-                            {outlets.map((outlet, index) => (
+                            {outlets.map((outlet) => (
                                 <tr key={outlet.outlet_id}>
 
                                     <td>
-                                        {index + 1}
+                                        {displayValue(outlet.uuid)}
                                     </td>
 
                                     <td>

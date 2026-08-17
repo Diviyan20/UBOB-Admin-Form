@@ -10,6 +10,8 @@ export const api = {
   outlets:`${DEVELOPMENT_URL}/admin/outlets`,
   register_outlet: `${DEVELOPMENT_URL}/admin/register_outlet`,
   check_auth: `${DEVELOPMENT_URL}/admin/check-auth`,
+  outlet_screens: `${DEVELOPMENT_URL}/outlet-screens`,
+  outlet_screen: (screenId: string) => `${DEVELOPMENT_URL}/outlet-screens/${screenId}`,
 
   videos: (outletId: string) => `${DEVELOPMENT_URL}/videos/${outletId}`,
 };
