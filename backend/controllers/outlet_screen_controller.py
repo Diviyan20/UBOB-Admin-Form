@@ -23,9 +23,12 @@ def get_all_outlet_screens_route():
 def get_outlet_screen_route(screen_id):
     try:
         data = fetch_outlet_screen(screen_id)
+        
         if not data:
             return jsonify({"success": False, "error": "Screen not found"}), 404
+        
         return jsonify({"success": True, "data": data}), 200
+    
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -33,6 +36,7 @@ def get_outlet_screen_route(screen_id):
 @outlet_screen_bp.route("", methods=["POST"])
 def create_outlet_screen_route():
     data = request.get_json(silent=True, force=True)
+    
     if not data:
         return jsonify({"success": False, "error": "Invalid or missing JSON"}), 400
 
@@ -50,6 +54,9 @@ def create_outlet_screen_route():
         batch_num=data.get("batch_num"),
         tier=data.get("tier"),
         video_uuid=data.get("video_uuid"),
+        start_datetime=data.get("start_datetime"),
+        end_datetime=data.get("end_datetime"),
+        frequency=data.get("frequency") or "Evergreen",
     )
 
     if not result.get("success"):
@@ -61,6 +68,7 @@ def create_outlet_screen_route():
 @outlet_screen_bp.route("/<screen_id>", methods=["PUT"])
 def update_outlet_screen_route(screen_id):
     data = request.get_json(silent=True, force=True)
+    
     if not data:
         return jsonify({"success": False, "error": "Invalid or missing JSON"}), 400
 
@@ -79,6 +87,7 @@ def delete_outlet_screen_route(screen_id):
 
     if not result.get("success"):
         status = 404 if "not found" in result.get("error", "").lower() else 400
+        
         return jsonify(result), status
 
     return jsonify(result), 200
