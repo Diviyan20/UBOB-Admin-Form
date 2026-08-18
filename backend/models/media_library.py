@@ -6,7 +6,7 @@ from models.active_outlets import get_db_connection
 BUCKET_NAME = os.getenv("VIDEO_BUCKET_NAME")
 S3_PREFIX = os.getenv("S3_MEDIA_PREFIX", "Global/")
 
-s3_client = boto3.client("s3", region_name="ap-southeast-5")
+s3_client = boto3.client("s3", region_name="ap-southeast-5", endpoint_url="https://s3.ap-southeast-5.amazonaws.com",)
 
 def sync_media_library():
     """
