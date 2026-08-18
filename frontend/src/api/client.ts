@@ -18,5 +18,6 @@ export const api = {
 
   // Media Library Endpoints
   media_library: `${DEVELOPMENT_URL}/admin/media-library`,
+  media_preview: (mediaId: string) => `${DEVELOPMENT_URL}/admin/media-library/${mediaId}/preview`,
   videos: (outletId: string) => `${DEVELOPMENT_URL}/videos/${outletId}`,
 };

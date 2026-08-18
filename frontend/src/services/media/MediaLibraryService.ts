@@ -4,6 +4,14 @@ import type { MediaLibraryItem } from "../../types/Media";
 interface GetAllMediaResponse {
     success: boolean;
     data: MediaLibraryItem[];
+    error?: string;
+}
+
+interface PreviewUrlResponse {
+    success: boolean;
+    url?: string;
+    file_name?: string;
+    error?: string;
 }
 
 function authHeaders(): HeadersInit {
@@ -19,16 +27,26 @@ export async function getAllMedia(): Promise<MediaLibraryItem[]> {
         method: "GET",
         headers: authHeaders(),
     });
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch media library. Server returned ${response.status}`);
-    }
-
     const result: GetAllMediaResponse = await response.json();
 
-    if (!result.success) {
-        throw new Error("Failed to fetch media library information");
+    if (!response.ok || !result.success) {
+        throw new Error(result.error ?? `Failed to fetch media library. Server returned ${response.status}`);
     }
 
     return result.data;
+}
+
+export async function getMediaPreviewUrl(mediaId: string): Promise<string>{
+    const response = await fetch(api.media_preview(mediaId),{
+        method: "GET",
+        headers: authHeaders(),
+    });
+
+    const result: PreviewUrlResponse = await response.json();
+
+    if (!response.ok || !result.success || !result.url) {
+        throw new Error(result.error ?? `Failed to get preview URL. Server returned ${response.status}`);
+    }
+    
+    return result.url;
 }
