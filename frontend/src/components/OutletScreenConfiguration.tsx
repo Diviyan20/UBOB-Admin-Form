@@ -11,12 +11,13 @@ import {
 import type { Outlet } from "../types/Outlet";
 import type { MediaLibraryItem } from "../types/Media";
 import type {
+  Frequency,
   Orientation,
   OutletScreen,
   ScreenType,
   Tier,
 } from "../types/OutletScreen";
-import "../styling/OutletScreenConfigurationStyles.css"
+import "../styling/OutletScreenConfigurationStyles.css";
 
 function displayValue(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === "") {
@@ -30,9 +31,43 @@ function displayDate(value: string | null | undefined): string {
   return new Date(value).toLocaleString();
 }
 
+/*
+  Pulls "YYYY-MM-DD" and "HH:MM" straight out of the stored ISO string,
+    without going through a Date object, so we don't get timezone drift
+    when round-tripping into separate date/time inputs.
+*/ 
+function splitDateTime(iso: string | null | undefined): {
+  date: string;
+  time: string;
+} {
+  if (!iso) return { date: "", time: "" };
+  return { date: iso.slice(0, 10), time: iso.slice(11, 16) };
+}
+
+/*
+  * "Daily" only cares about time of day
+  * Date is pinned to a sentinel so the column stays a normal TIMESTAMPTZ
+  * Whatever reads this for playback later must ignore the date portion for Daily screens.
+*/ 
+const DAILY_SENTINEL_DATE = "1970-01-01";
+
+function displayScreenSchedule(screen: OutletScreen): string {
+  if (screen.frequency === "Evergreen") return "All day";
+  if (screen.frequency === "Daily") {
+    const start = splitDateTime(screen.start_datetime).time;
+    const end = splitDateTime(screen.end_datetime).time;
+    if (!start && !end) return "Null";
+    return `${start || "?"} – ${end || "?"}`;
+  }
+  // LTO (Limited Time Offer)
+  if (!screen.start_datetime && !screen.end_datetime) return "Null";
+  return `${displayDate(screen.start_datetime)} – ${displayDate(screen.end_datetime)}`;
+}
+
 const SCREEN_TYPES: ScreenType[] = ["Signage", "Media Player"];
 const TIERS: Tier[] = ["Tier A", "Tier B"];
 const ORIENTATIONS: Orientation[] = ["Portrait", "Landscape"];
+const FREQUENCIES: Frequency[] = ["Evergreen", "Daily", "LTO"];
 
 interface ScreenFormState {
   outlet_uid: string;
@@ -41,6 +76,11 @@ interface ScreenFormState {
   tier: Tier | "";
   orientation: Orientation | "";
   video_uuid: string;
+  frequency: Frequency;
+  start_date: string;
+  start_time: string;
+  end_date: string;
+  end_time: string;
 }
 
 const EMPTY_FORM: ScreenFormState = {
@@ -50,6 +90,11 @@ const EMPTY_FORM: ScreenFormState = {
   tier: "",
   orientation: "",
   video_uuid: "",
+  frequency: "Evergreen",
+  start_date: "",
+  start_time: "",
+  end_date: "",
+  end_time: "",
 };
 
 export default function OutletScreenConfiguration() {
@@ -91,6 +136,7 @@ export default function OutletScreenConfiguration() {
     }
   }
 
+  // Opens the form to add a new outlet screen
   function openAddForm() {
     setEditingScreenId(null);
     setForm(EMPTY_FORM);
@@ -98,7 +144,11 @@ export default function OutletScreenConfiguration() {
     setShowForm(true);
   }
 
+  // Opens the editing form of an existing outlet screen
   function openEditForm(screen: OutletScreen) {
+    const start = splitDateTime(screen.start_datetime);
+    const end = splitDateTime(screen.end_datetime);
+
     setEditingScreenId(screen.screen_id);
     setForm({
       outlet_uid: screen.outlet_uid,
@@ -107,11 +157,17 @@ export default function OutletScreenConfiguration() {
       tier: screen.tier ?? "",
       orientation: screen.orientation,
       video_uuid: screen.video_uuid ?? "",
+      frequency: screen.frequency,
+      start_date: start.date,
+      start_time: start.time,
+      end_date: end.date,
+      end_time: end.time,
     });
     setFormError(null);
     setShowForm(true);
   }
 
+  // Closes forms
   function closeForm() {
     setShowForm(false);
     setEditingScreenId(null);
@@ -119,13 +175,49 @@ export default function OutletScreenConfiguration() {
     setFormError(null);
   }
 
-  // outlet_name is never typed in — it's looked up from the outlet the admin
-  // picked in the dropdown, using data already fetched for the dropdown itself.
+  /*
+    * outlet_name is never typed in — it's looked up from the outlet the admin
+    * Picked in the dropdown, using data already fetched for the dropdown itself.
+  */ 
   const selectedOutletName = outlets.find(
     (o) => o.uuid === form.outlet_uid,
   )?.outlet_name;
 
-  async function handleSubmit(event: React.FormEvent) {
+  function buildScheduleFields(): {
+    start_datetime: string | null;
+    end_datetime: string | null;
+  } {
+    // Schedule for media running all day
+    if (form.frequency === "Evergreen") {
+      return { start_datetime: null, end_datetime: null };
+    }
+
+    // Schedule for media running every day, at a certain time
+    if (form.frequency === "Daily") {
+      return {
+        start_datetime: form.start_time
+          ? `${DAILY_SENTINEL_DATE}T${form.start_time}:00`
+          : null,
+        end_datetime: form.end_time
+          ? `${DAILY_SENTINEL_DATE}T${form.end_time}:00`
+          : null,
+      };
+    }
+
+    // LTO (Limited Time Offer scehdule)
+    return {
+      start_datetime:
+        form.start_date && form.start_time
+          ? `${form.start_date}T${form.start_time}:00`
+          : null,
+      end_datetime:
+        form.end_date && form.end_time
+          ? `${form.end_date}T${form.end_time}:00`
+          : null,
+    };
+  }
+
+  async function handleSubmit(event: React.SubmitEvent) {
     event.preventDefault();
     setFormError(null);
 
@@ -133,6 +225,8 @@ export default function OutletScreenConfiguration() {
       setFormError("Outlet, screen type, and orientation are required");
       return;
     }
+
+    const { start_datetime, end_datetime } = buildScheduleFields();
 
     const payload = {
       outlet_uid: form.outlet_uid,
@@ -144,6 +238,9 @@ export default function OutletScreenConfiguration() {
           : null,
       tier: form.tier || null,
       video_uuid: form.video_uuid || null,
+      frequency: form.frequency,
+      start_datetime,
+      end_datetime,
     };
 
     try {
@@ -232,6 +329,8 @@ export default function OutletScreenConfiguration() {
                 <th>Tier</th>
                 <th>Orientation</th>
                 <th>Video</th>
+                <th>Frequency</th>
+                <th>Schedule</th>
                 <th>Created</th>
                 <th>Updated</th>
               </tr>
@@ -259,6 +358,8 @@ export default function OutletScreenConfiguration() {
                   <td>{displayValue(screen.tier)}</td>
                   <td>{displayValue(screen.orientation)}</td>
                   <td>{displayValue(screen.video_name)}</td>
+                  <td>{displayValue(screen.frequency)}</td>
+                  <td>{displayScreenSchedule(screen)}</td>
                   <td>{displayDate(screen.created_at)}</td>
                   <td>{displayDate(screen.updated_at)}</td>
                 </tr>
@@ -391,6 +492,100 @@ export default function OutletScreenConfiguration() {
                   ))}
                 </select>
               </label>
+
+              <label>
+                Frequency
+                <select
+                  value={form.frequency}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      frequency: e.target.value as Frequency,
+                      start_date: "",
+                      start_time: "",
+                      end_date: "",
+                      end_time: "",
+                    })
+                  }
+                  required
+                >
+                  {FREQUENCIES.map((freq) => (
+                    <option key={freq} value={freq}>
+                      {freq}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              {form.frequency === "Daily" && (
+                <>
+                  <label>
+                    Start Time
+                    <input
+                      type="time"
+                      value={form.start_time}
+                      onChange={(e) =>
+                        setForm({ ...form, start_time: e.target.value })
+                      }
+                    />
+                  </label>
+                  <label>
+                    End Time
+                    <input
+                      type="time"
+                      value={form.end_time}
+                      onChange={(e) =>
+                        setForm({ ...form, end_time: e.target.value })
+                      }
+                    />
+                  </label>
+                </>
+              )}
+
+              {form.frequency === "LTO" && (
+                <>
+                  <label>
+                    Start Date
+                    <input
+                      type="date"
+                      value={form.start_date}
+                      onChange={(e) =>
+                        setForm({ ...form, start_date: e.target.value })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Start Time
+                    <input
+                      type="time"
+                      value={form.start_time}
+                      onChange={(e) =>
+                        setForm({ ...form, start_time: e.target.value })
+                      }
+                    />
+                  </label>
+                  <label>
+                    End Date
+                    <input
+                      type="date"
+                      value={form.end_date}
+                      onChange={(e) =>
+                        setForm({ ...form, end_date: e.target.value })
+                      }
+                    />
+                  </label>
+                  <label>
+                    End Time
+                    <input
+                      type="time"
+                      value={form.end_time}
+                      onChange={(e) =>
+                        setForm({ ...form, end_time: e.target.value })
+                      }
+                    />
+                  </label>
+                </>
+              )}
 
               {formError && (
                 <p className="outlet-screen-form-error">{formError}</p>
