@@ -149,7 +149,6 @@ def get_all_media():
 
     This function is read-only.
     """
-
     try:
 
         with get_db_connection() as (conn, cur):

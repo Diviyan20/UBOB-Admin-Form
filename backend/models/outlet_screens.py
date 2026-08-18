@@ -36,10 +36,11 @@ def _row_to_dict(row) -> dict:
 
 _SELECT_JOIN = """
     SELECT os.screen_id, os.outlet_uid, ao.outlet_name, os.screen_type,
-           os.batch_num, os.tier, os.orientation, os.video_uuid,
+           os.batch_num, os.tier, os.orientation, os.video_uuid, ml.file_name,
            os.created_at, os.updated_at
     FROM outlet_screens os
     JOIN active_outlets ao ON os.outlet_uid = ao.uuid
+    LEFT JOIN media_library ml ON os.video_uuid = ml.media_id
 """
 
 def get_all_outlet_screens() -> list:

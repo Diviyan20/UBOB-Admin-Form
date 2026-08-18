@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { refreshMediaLibrary } from "../services/media/MediaLibraryService";
+import { getAllMedia } from "../services/media/MediaLibraryService";
 
-import type { Media } from "../types/Media";
+import type { MediaLibraryItem } from "../types/Media";
 
 import "../styling/MediaLibraryStyling.css";
 
@@ -14,7 +14,7 @@ function displayValue(value: string | null | undefined): string {
 }
 
 export default function MediaLibrary() {
-  const [media, setMedia] = useState<Media[]>([]);
+  const [media, setMedia] = useState<MediaLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -30,7 +30,7 @@ export default function MediaLibrary() {
       setLoading(true);
       setError(null);
 
-      const data = await refreshMediaLibrary();
+      const data = await getAllMedia();
 
       setMedia(data);
     } catch (error) {
@@ -47,7 +47,7 @@ export default function MediaLibrary() {
       setRefreshing(true);
       setError(null);
 
-      const data = await refreshMediaLibrary();
+      const data = await getAllMedia();
 
       setMedia(data);
     } catch (error) {

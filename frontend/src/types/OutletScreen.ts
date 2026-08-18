@@ -13,6 +13,7 @@ export interface OutletScreen {
     tier: Tier | null;
     orientation: Orientation;
     video_uuid: UUID | null;
+    video_name: string | null;
     created_at: string | null;
     updated_at: string | null;
 }
