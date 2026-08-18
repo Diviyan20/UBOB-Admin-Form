@@ -13,6 +13,9 @@
     display: flex;
     gap: 0.5rem;
 }
+.outlet-screen-dashboard-header h2 {
+    color: #ffff;
+}
 
 .outlet-screen-dashboard-loading,
 .outlet-screen-dashboard-error {
@@ -36,6 +39,10 @@
     text-align: left;
 }
 
+.outlet-screen-table td{
+    color: #ffff;
+}
+
 .outlet-screen-table th {
     background-color: #f5f5f5;
 }
@@ -43,6 +50,32 @@
 .outlet-screen-actions {
     display: flex;
     gap: 0.5rem;
+}
+
+.outlet-screen-edit-btn {
+    background-color: #e67e22;
+    color: #fff;
+    border: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.outlet-screen-edit-btn:hover {
+    background-color: #cf711c;
+}
+
+.outlet-screen-delete-btn {
+    background-color: #c0392b;
+    color: #fff;
+    border: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.outlet-screen-delete-btn:hover {
+    background-color: #a5301f;
 }
 
 .outlet-screen-modal-backdrop {

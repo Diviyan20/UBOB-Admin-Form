@@ -3,7 +3,7 @@ from models.active_outlets import register_outlet
 from models.admin_credentials import retrieve_credentials
 from utils.auth import generate_admin_token
 from utils.decorators import admin_required
-from services.admin_service import fetch_all_outlets
+from services.admin_service import fetch_all_outlets, fetch_all_media
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -95,6 +95,21 @@ def get_all_outlets():
                 "data": data
             }), 200
     
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+"""
+MEDIA
+"""
+@admin_bp.route("/media-library", methods=["GET"])
+def get_all_media_route():
+    try:
+        data = fetch_all_media()
+        return jsonify({"success": True, "data": data}), 200
+
     except Exception as e:
         return jsonify({
             "success": False,

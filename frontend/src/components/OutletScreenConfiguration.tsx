@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAllOutlets } from "../services/outlet/OutletService";
+import { getAllMedia } from "../services/media/MediaLibraryService";
 
 import {
   createOutletScreen,
@@ -8,6 +9,7 @@ import {
   updateOutletScreen,
 } from "../services/outlet/OutletScreenService";
 import type { Outlet } from "../types/Outlet";
+import type { MediaLibraryItem } from "../types/Media";
 import type {
   Orientation,
   OutletScreen,
@@ -23,6 +25,11 @@ function displayValue(value: string | number | null | undefined): string {
   return String(value);
 }
 
+function displayDate(value: string | null | undefined): string {
+  if (!value) return "Null";
+  return new Date(value).toLocaleString();
+}
+
 const SCREEN_TYPES: ScreenType[] = ["Signage", "Media Player"];
 const TIERS: Tier[] = ["Tier A", "Tier B"];
 const ORIENTATIONS: Orientation[] = ["Portrait", "Landscape"];
@@ -33,6 +40,7 @@ interface ScreenFormState {
   batch_num: string;
   tier: Tier | "";
   orientation: Orientation | "";
+  video_uuid: string;
 }
 
 const EMPTY_FORM: ScreenFormState = {
@@ -41,11 +49,13 @@ const EMPTY_FORM: ScreenFormState = {
   batch_num: "",
   tier: "",
   orientation: "",
+  video_uuid: "",
 };
 
 export default function OutletScreenConfiguration() {
   const [screens, setScreens] = useState<OutletScreen[]>([]);
   const [outlets, setOutlets] = useState<Outlet[]>([]);
+  const [media, setMedia] = useState<MediaLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,13 +74,15 @@ export default function OutletScreenConfiguration() {
       setLoading(true);
       setError(null);
 
-      const [screenData, outletData] = await Promise.all([
+      const [screenData, outletData, mediaData] = await Promise.all([
         getAllOutletScreens(),
         getAllOutlets(),
+        getAllMedia(),
       ]);
 
       setScreens(screenData);
       setOutlets(outletData);
+      setMedia(mediaData);
     } catch (error) {
       console.error("Failed to fetch outlet screens:", error);
       setError("Failed to load outlet screen information");
@@ -94,6 +106,7 @@ export default function OutletScreenConfiguration() {
       batch_num: screen.batch_num?.toString() ?? "",
       tier: screen.tier ?? "",
       orientation: screen.orientation,
+      video_uuid: screen.video_uuid ?? "",
     });
     setFormError(null);
     setShowForm(true);
@@ -112,7 +125,7 @@ export default function OutletScreenConfiguration() {
     (o) => o.uuid === form.outlet_uid,
   )?.outlet_name;
 
-  async function handleSubmit(event: React.SubmitEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setFormError(null);
 
@@ -130,6 +143,7 @@ export default function OutletScreenConfiguration() {
           ? Number(form.batch_num)
           : null,
       tier: form.tier || null,
+      video_uuid: form.video_uuid || null,
     };
 
     try {
@@ -211,28 +225,42 @@ export default function OutletScreenConfiguration() {
           <table className="outlet-screen-table">
             <thead>
               <tr>
+                <th></th>
                 <th>Outlet</th>
                 <th>Screen Type</th>
                 <th>Batch</th>
                 <th>Tier</th>
                 <th>Orientation</th>
                 <th>Video</th>
-                <th>Actions</th>
+                <th>Created</th>
+                <th>Updated</th>
               </tr>
             </thead>
             <tbody>
               {screens.map((screen) => (
                 <tr key={screen.screen_id}>
+                  <td className="outlet-screen-actions">
+                    <button
+                      className="outlet-screen-edit-btn"
+                      onClick={() => openEditForm(screen)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="outlet-screen-delete-btn"
+                      onClick={() => handleDelete(screen)}
+                    >
+                      Delete
+                    </button>
+                  </td>
                   <td>{displayValue(screen.outlet_name)}</td>
                   <td>{displayValue(screen.screen_type)}</td>
                   <td>{displayValue(screen.batch_num)}</td>
                   <td>{displayValue(screen.tier)}</td>
                   <td>{displayValue(screen.orientation)}</td>
-                  <td>{displayValue(screen.video_uuid)}</td>
-                  <td className="outlet-screen-actions">
-                    <button onClick={() => openEditForm(screen)}>Edit</button>
-                    <button onClick={() => handleDelete(screen)}>Delete</button>
-                  </td>
+                  <td>{displayValue(screen.video_name)}</td>
+                  <td>{displayDate(screen.created_at)}</td>
+                  <td>{displayDate(screen.updated_at)}</td>
                 </tr>
               ))}
             </tbody>
@@ -349,8 +377,18 @@ export default function OutletScreenConfiguration() {
 
               <label>
                 Video
-                <select disabled>
-                  <option>No media available yet</option>
+                <select
+                  value={form.video_uuid}
+                  onChange={(e) =>
+                    setForm({ ...form, video_uuid: e.target.value })
+                  }
+                >
+                  <option value="">None</option>
+                  {media.map((item) => (
+                    <option key={item.media_id} value={item.media_id}>
+                      {item.file_name}
+                    </option>
+                  ))}
                 </select>
               </label>
 
