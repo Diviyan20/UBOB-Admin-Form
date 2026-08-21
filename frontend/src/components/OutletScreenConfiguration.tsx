@@ -35,20 +35,50 @@ function displayDate(value: string | null | undefined): string {
   Pulls "YYYY-MM-DD" and "HH:MM" straight out of the stored ISO string,
     without going through a Date object, so we don't get timezone drift
     when round-tripping into separate date/time inputs.
-*/ 
+*/
 function splitDateTime(iso: string | null | undefined): {
   date: string;
   time: string;
 } {
   if (!iso) return { date: "", time: "" };
-  return { date: iso.slice(0, 10), time: iso.slice(11, 16) };
+  const parsed = new Date(iso);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return {
+      date: "",
+      time: "",
+    };
+  }
+
+  const year = parsed.getFullYear();
+  const month = String(
+    parsed.getMonth() + 1,
+  ).padStart(2, "0");
+
+  const day = String(
+    parsed.getDate(),
+  ).padStart(2, "0");
+
+  const hours = String(
+    parsed.getHours(),
+  ).padStart(2, "0");
+
+  const minutes = String(
+    parsed.getMinutes(),
+  ).padStart(2, "0");
+
+  return {
+    date: `${year}-${month}-${day}`,
+    time: `${hours}:${minutes}`,
+  };
 }
 
 /*
-  * "Daily" only cares about time of day
-  * Date is pinned to a sentinel so the column stays a normal TIMESTAMPTZ
-  * Whatever reads this for playback later must ignore the date portion for Daily screens.
-*/ 
+ * "Daily" only cares about time of day
+ * Date is pinned to a sentinel so the column stays a normal TIMESTAMPTZ
+ * Whatever reads this for playback later must ignore the date portion for Daily screens.
+ */
+const OUTLET_TIMEZONE_OFFSET = "+08:00";
 const DAILY_SENTINEL_DATE = "1970-01-01";
 
 function displayScreenSchedule(screen: OutletScreen): string {
@@ -176,9 +206,9 @@ export default function OutletScreenConfiguration() {
   }
 
   /*
-    * outlet_name is never typed in — it's looked up from the outlet the admin
-    * Picked in the dropdown, using data already fetched for the dropdown itself.
-  */ 
+   * outlet_name is never typed in — it's looked up from the outlet the admin
+   * Picked in the dropdown, using data already fetched for the dropdown itself.
+   */
   const selectedOutletName = outlets.find(
     (o) => o.uuid === form.outlet_uid,
   )?.outlet_name;
@@ -187,32 +217,72 @@ export default function OutletScreenConfiguration() {
     start_datetime: string | null;
     end_datetime: string | null;
   } {
-    // Schedule for media running all day
+    // Evergreen = no schedule boundaries.
     if (form.frequency === "Evergreen") {
       return { start_datetime: null, end_datetime: null };
     }
 
-    // Schedule for media running every day, at a certain time
+    // ===========================================================================
+    // Daily
+    // ===========================================================================
+    //
+    // Daily schedules are stored in the TIMESTAMPTZ column using a sentinel date.
+    //
+    // IMPORTANT:
+    // We explicitly attach Malaysia's +08:00 offset.
+    //
+    // Example:
+    //
+    // Admin selects:
+    //   10:53
+    //
+    // We send:
+    //   1970-01-01T10:53:00+08:00
+    //
+    // PostgreSQL converts that to:
+    //   1970-01-01T02:53:00+00:00
+    //
+    // Which means the stored timestamp represents 10:53 AM Malaysia time.
+    //
+    // ===========================================================================
     if (form.frequency === "Daily") {
       return {
         start_datetime: form.start_time
-          ? `${DAILY_SENTINEL_DATE}T${form.start_time}:00`
+          ? `${DAILY_SENTINEL_DATE}T${form.start_time}:00${OUTLET_TIMEZONE_OFFSET}`
           : null,
+
         end_datetime: form.end_time
-          ? `${DAILY_SENTINEL_DATE}T${form.end_time}:00`
+          ? `${DAILY_SENTINEL_DATE}T${form.end_time}:00${OUTLET_TIMEZONE_OFFSET}`
           : null,
       };
     }
 
-    // LTO (Limited Time Offer scehdule)
+    // ===========================================================================
+    // LTO
+    // ===========================================================================
+    //
+    // LTO is a real calendar date + time.
+    //
+    // Example:
+    //
+    //   2026-08-21 + 15:15
+    //
+    // becomes:
+    //
+    //   2026-08-21T15:15:00+08:00
+    //
+    // PostgreSQL then stores the equivalent UTC timestamp.
+    //
+    // ===========================================================================
     return {
       start_datetime:
         form.start_date && form.start_time
-          ? `${form.start_date}T${form.start_time}:00`
+          ? `${form.start_date}T${form.start_time}:00${OUTLET_TIMEZONE_OFFSET}`
           : null,
+
       end_datetime:
         form.end_date && form.end_time
-          ? `${form.end_date}T${form.end_time}:00`
+          ? `${form.end_date}T${form.end_time}:00${OUTLET_TIMEZONE_OFFSET}`
           : null,
     };
   }
