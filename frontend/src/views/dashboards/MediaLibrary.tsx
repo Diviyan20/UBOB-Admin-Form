@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-  getAllMedia,
-  getMediaPreviewUrl,
-} from "../services/media/MediaLibraryService";
+import { getAllMedia, getMediaPreviewUrl } from "../../services/media/MediaLibraryService";
 
-import type { MediaLibraryItem } from "../types/Media";
+import type { MediaLibraryItem } from "../../types/Media";
 
-import "../styling/MediaLibraryStyling.css";
+import "../../styling/MediaLibraryStyling.css";
 
 function displayValue(value: string | null | undefined): string {
   if (value === null || value === undefined || value === "") {

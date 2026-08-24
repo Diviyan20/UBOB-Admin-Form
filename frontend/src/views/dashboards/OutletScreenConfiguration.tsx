@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react";
-import { getAllOutlets } from "../services/outlet/OutletService";
-import { getAllMedia } from "../services/media/MediaLibraryService";
+import { getAllOutlets } from "../../services/outlet/OutletService";
+import { getAllMedia } from "../../services/media/MediaLibraryService";
 
 import {
   createOutletScreen,
   deleteOutletScreen,
   getAllOutletScreens,
   updateOutletScreen,
-} from "../services/outlet/OutletScreenService";
-import type { Outlet } from "../types/Outlet";
-import type { MediaLibraryItem } from "../types/Media";
+} from "../../services/outlet/OutletScreenService";
+import type { Outlet } from "../../types/Outlet";
+import type { MediaLibraryItem } from "../../types/Media";
 import type {
   Frequency,
   Orientation,
   OutletScreen,
   ScreenType,
   Tier,
-} from "../types/OutletScreen";
-import "../styling/OutletScreenConfigurationStyles.css";
+} from "../../types/OutletScreen";
+import "../../styling/OutletScreenConfigurationStyles.css";
 
 function displayValue(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === "") {
