@@ -36,7 +36,7 @@ function displayDate(value: string | null | undefined): string {
     without going through a Date object, so we don't get timezone drift
     when round-tripping into separate date/time inputs.
 */
-function splitDateTime(iso: string | null | undefined): {
+function splitDateTime(iso: string | null | undefined, isDaily = false): {
   date: string;
   time: string;
 } {
@@ -50,7 +50,22 @@ function splitDateTime(iso: string | null | undefined): {
     };
   }
 
+  // The application timezone is fixed at UTC+08:00.
+  if(isDaily){
+    const malaysiaTime = new Date(parsed.getTime() + 8 * 60 * 60 * 1000);
+
+    const hours = String(malaysiaTime.getUTCHours()).padStart(2, "0");
+
+    const minutes = String(malaysiaTime.getUTCMinutes()).padStart(2, "0");
+
+    return{
+      date: DAILY_SENTINEL_DATE,
+      time: `${hours}:${minutes}`,
+    };
+  }
+
   const year = parsed.getFullYear();
+  
   const month = String(
     parsed.getMonth() + 1,
   ).padStart(2, "0");
@@ -83,14 +98,18 @@ const DAILY_SENTINEL_DATE = "1970-01-01";
 
 function displayScreenSchedule(screen: OutletScreen): string {
   if (screen.frequency === "Evergreen") return "All day";
+  
   if (screen.frequency === "Daily") {
-    const start = splitDateTime(screen.start_datetime).time;
-    const end = splitDateTime(screen.end_datetime).time;
+    const start = splitDateTime(screen.start_datetime, true).time;
+    const end = splitDateTime(screen.end_datetime, true).time;
+    
     if (!start && !end) return "Null";
+    
     return `${start || "?"} – ${end || "?"}`;
   }
   // LTO (Limited Time Offer)
   if (!screen.start_datetime && !screen.end_datetime) return "Null";
+  
   return `${displayDate(screen.start_datetime)} – ${displayDate(screen.end_datetime)}`;
 }
 
@@ -176,10 +195,16 @@ export default function OutletScreenConfiguration() {
 
   // Opens the editing form of an existing outlet screen
   function openEditForm(screen: OutletScreen) {
-    const start = splitDateTime(screen.start_datetime);
-    const end = splitDateTime(screen.end_datetime);
+    const start = splitDateTime(
+      screen.start_datetime,
+      screen.frequency === "Daily");
+
+    const end = splitDateTime(
+      screen.end_datetime,
+      screen.frequency === "Daily");
 
     setEditingScreenId(screen.screen_id);
+    
     setForm({
       outlet_uid: screen.outlet_uid,
       screen_type: screen.screen_type,
@@ -193,6 +218,7 @@ export default function OutletScreenConfiguration() {
       end_date: end.date,
       end_time: end.time,
     });
+
     setFormError(null);
     setShowForm(true);
   }
