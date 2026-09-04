@@ -29,8 +29,8 @@ def get_db_credentials():
 def get_system_config():
     with psycopg2.connect(
         database=DB_NAME,
-        user=get_db_credentials()["username"],
-        password=get_db_credentials()["password"],
+        user=DB_USERNAME,
+        password=DB_PASSWORD,
         host=DB_HOSTNAME,
         port=DB_PORT,
         cursor_factory=RealDictCursor
@@ -45,7 +45,7 @@ def get_system_config():
 
             cur.execute(query)
             result = cur.fetchone()
-            
+
             print("[CONFIG] Database result:", result)
             print(
                 "[CONFIG] version_check:",
