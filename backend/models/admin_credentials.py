@@ -34,11 +34,10 @@ def get_db_connection():
     conn = None
     cur = None
     try:
-        
         conn = psycopg2.connect(
             database = OUTLET_DATABASE,
             user = creds["username"],
-            password = creds["password"],
+            password = DB_PASSWORD,
             host = DB_HOSTNAME,
             port = DB_PORT
         )
@@ -51,10 +50,7 @@ def get_db_connection():
     except psycopg2.Error as e:
         if conn:
             conn.rollback()
-        return jsonify({
-            "error": "Database connection error",
-            "message": str(e)
-        })
+        raise
         
     finally:
         if cur:
@@ -63,25 +59,26 @@ def get_db_connection():
             conn.close()
 
 def retrieve_credentials(email, password):
-    try:
-        with get_db_connection() as (conn, cur):
-        
-            query = """SELECT email, password FROM admin_credentials WHERE email=%s;"""
-            cur.execute(query, (email,))
-            row = cur.fetchone()
-            
-            if not row:
-                return None
-            stored_hash = row[1]
-            
-            # Compare plaintext password against the stored hash
-            if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
-                return row  # Valid
-            else:
-                return None  # Wrong password
-            
-    except psycopg2.Error as e:
-        return jsonify({
-            "error": "Database Error",
-            "message": str(e)
-        })
+    with get_db_connection() as (conn, cur):
+
+        query = """
+            SELECT email, password
+            FROM admin_credentials
+            WHERE email = %s;
+        """
+
+        cur.execute(query, (email,))
+        row = cur.fetchone()
+
+        if not row:
+            return None
+
+        stored_hash = row[1]
+
+        if bcrypt.checkpw(
+            password.encode("utf-8"),
+            stored_hash.encode("utf-8")
+        ):
+            return row
+
+        return None

@@ -50,7 +50,7 @@ def get_db_connection():
         conn = psycopg2.connect(
             database = OUTLET_DATABASE,
             user = creds["username"],
-            password = creds["password"],
+            password = DB_PASSWORD,
             host = DB_HOSTNAME,
             port = DB_PORT
         )
@@ -114,7 +114,7 @@ def get_all_outlets() -> dict:
             outlets = cur.fetchall()
             
             if not outlets:
-                return []
+                return None
             
             return[{
                 "outlet_id": outlet[0],
