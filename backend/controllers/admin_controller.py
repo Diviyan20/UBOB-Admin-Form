@@ -4,6 +4,7 @@ from models.admin_credentials import retrieve_credentials
 from utils.auth import generate_admin_token
 from utils.decorators import admin_required
 from services.admin_service import fetch_all_outlets
+from jobs.inactive_devices import check_for_inactive_devices
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -89,11 +90,30 @@ def get_all_outlets():
     try:
         data = fetch_all_outlets()
 
-        if data:
-            return jsonify({
-                "success": True,
-                "data": data
-            }), 200
+        return jsonify({
+            "success": True,
+            "data": data
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+@admin_bp.route("/outlets/refresh-status", methods=["POST"])
+def refresh_outlet_status():
+    try:
+        job_result = check_for_inactive_devices()
+        outlets = fetch_all_outlets()
+
+        return jsonify({
+            "success": True,
+            "data": outlets,
+            "marked_offline": job_result["marked_offline"],
+            "count": job_result["count"],
+        }), 200
 
     except Exception as e:
         return jsonify({

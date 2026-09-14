@@ -178,13 +178,19 @@ def search_online_devices():
 
 def mark_device_offline(outlet_id):
     with get_db_connection() as (conn, cur):
+        
         query = """
                 UPDATE active_outlets
                 SET outlet_status = 'offline'
                 WHERE outlet_id = %s
-            """
+                AND outlet_status = 'online'
+                RETURNING outlet_id;
+                """
         cur.execute(query,(outlet_id,))
+        result = cur.fetchone()
         conn.commit()
+        
+        return result is not None
 
 def register_outlet(outlet_id:str, outlet_name:str, region_name:str, 
                     order_api_url:str, order_api_key:str, tier: str):
