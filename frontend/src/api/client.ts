@@ -15,6 +15,7 @@ export const api = {
   register_outlet: `${DEVELOPMENT_URL}/admin/register_outlet`,
   outlet_screens: `${DEVELOPMENT_URL}/outlet-screens`,
   outlet_screen: (screenId: string) => `${DEVELOPMENT_URL}/outlet-screens/${screenId}`,
+  refresh_outlet_status: `${DEVELOPMENT_URL}/admin/outlets/refresh-status`,
 
   // Media Library Endpoints
   media_library: `${DEVELOPMENT_URL}/admin/media-library`,
