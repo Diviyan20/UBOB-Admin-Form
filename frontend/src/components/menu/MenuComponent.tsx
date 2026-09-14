@@ -109,6 +109,9 @@ export default function MenuBar() {
           <MenuItem sx={menuItemSx} onClick={() => goTo('/outlet-screen', handleConfigClose)}>
             Outlet Screen Configuration
           </MenuItem>
+          <MenuItem sx={menuItemSx} onClick={() => goTo('/system-configuration', handleConfigClose)}>
+            System Configuration
+          </MenuItem>
         </Menu>
 
         <Button

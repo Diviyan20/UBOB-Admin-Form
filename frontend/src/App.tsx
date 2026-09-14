@@ -10,6 +10,7 @@ import AdminLoginForm from "./views/forms/AdminLoginForm";
 import ConfigurationForm from "./views/forms/ConfigurationForm";
 import OutletDashboard from "./views/dashboards/OutletDashboard";
 import OutletScreenConfiguration from "./views/dashboards/OutletScreenConfiguration";
+import SystemConfigTable from "./views/dashboards/SystemConfigTable";
 import MediaLibrary from "./views/dashboards/MediaLibrary";
 import MenuBar from "./components/menu/MenuComponent";
 
@@ -36,6 +37,7 @@ function App() {
             element={<OutletScreenConfiguration />}
           ></Route>
           <Route path="/media-library" element={<MediaLibrary />}></Route>
+          <Route path="/system-configuration" element={<SystemConfigTable />}></Route>
         </Route>
       </Routes>
     </BrowserRouter>
