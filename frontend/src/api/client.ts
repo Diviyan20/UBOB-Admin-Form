@@ -21,4 +21,7 @@ export const api = {
   media_library: `${DEVELOPMENT_URL}/admin/media-library`,
   media_preview: (mediaId: string) => `${DEVELOPMENT_URL}/admin/media-library/${mediaId}/preview`,
   videos: (outletId: string) => `${DEVELOPMENT_URL}/videos/${outletId}`,
+
+  // System Configuration Endpoints
+  system_config: `${DEVELOPMENT_URL}/config`,
 };

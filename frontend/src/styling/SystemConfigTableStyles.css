@@ -1,0 +1,267 @@
+/* =========================================================
+   SYSTEM CONFIGURATION
+   ========================================================= */
+
+.system-config-table {
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    color: #222;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.system-config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.system-config-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.system-config-header p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: #777;
+}
+
+
+/* =========================================================
+   HEADER ACTIONS
+   ========================================================= */
+
+.system-config-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.system-config-actions button {
+    border: none;
+    border-radius: 6px;
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    background: #f1f1f1;
+    color: #333;
+    transition:
+        background 0.2s ease,
+        transform 0.1s ease;
+}
+
+.system-config-actions button:hover {
+    background: #e2e2e2;
+}
+
+.system-config-actions button:active {
+    transform: translateY(1px);
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.system-config-error {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    background: #fff0f0;
+    border: 1px solid #f2b8b8;
+    color: #b42318;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TABLE CONTAINER
+   ========================================================= */
+
+.system-config-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.system-config-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.system-config-table-container thead {
+    background: #f7f7f7;
+}
+
+.system-config-table-container th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.system-config-table-container td {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid #eeeeee;
+    vertical-align: middle;
+}
+
+.system-config-table-container tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.system-config-table-container tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* =========================================================
+   FIELD NAME
+   ========================================================= */
+
+.system-config-table-container td:first-child {
+    width: 45%;
+    font-weight: 500;
+    color: #333;
+}
+
+
+/* =========================================================
+   VALUE
+   ========================================================= */
+
+.system-config-table-container td:nth-child(2) {
+    width: 25%;
+    font-family: monospace;
+    font-size: 15px;
+    color: #444;
+}
+
+
+/* =========================================================
+   EDIT INPUT
+   ========================================================= */
+
+.system-config-table-container input {
+    width: 120px;
+    padding: 8px 10px;
+    border: 1px solid #cfcfcf;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 14px;
+    color: #333;
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+.system-config-table-container input:focus {
+    outline: none;
+    border-color: #777;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =========================================================
+   ACTION COLUMN
+   ========================================================= */
+
+.system-config-table-container td:last-child {
+    width: 30%;
+}
+
+.system-config-table-container td:last-child {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+
+/* =========================================================
+   TABLE BUTTONS
+   ========================================================= */
+
+.system-config-table-container button {
+    border: none;
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.1s ease;
+}
+
+.system-config-table-container button:hover {
+    background: #e5e5e5;
+}
+
+.system-config-table-container button:active {
+    transform: translateY(1px);
+}
+
+.system-config-table-container button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.system-config-table {
+    min-height: 120px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .system-config-table {
+        padding: 16px;
+    }
+
+    .system-config-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .system-config-actions {
+        width: 100%;
+    }
+
+    .system-config-actions button {
+        flex: 1;
+    }
+}
